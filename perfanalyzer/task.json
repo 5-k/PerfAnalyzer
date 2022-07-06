@@ -1,0 +1,257 @@
+{
+    "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
+    "id": "3993fb6e-40a9-4ae7-837b-081c8682d7d9",
+    "name": "perfanalyzer",
+    "friendlyName": "Performance Analyzer",
+    "description": "Run Performance Test using Apache JMeter and Analyze Results",
+    "helpMarkDown": "This task enables to run Performance testng using Apache Jmeter, Analyze report and post results. This task uses Apache Jmeter 5.5 and expects a valid parametrized JMX File, Any input Files, and property file for JMX. The task runs the jmx files according to the configured values in JMX and publishes the result to $web of your storage container. You need to enable static hosting in the storage container in order to be able to view html results.",
+    "category": "Utility",
+    "author": "Prateek Mishra",
+    "version": {
+        "Major": 1,
+        "Minor": 0,
+        "Patch": 7
+    },
+    "instanceNameFormat": "Run Perf Analyzer",
+    "groups": [
+        {
+          "name": "advanced",
+          "displayName": "Advanced",
+          "isExpanded": false
+        }
+    ],
+    "inputs": [       
+        {
+            "name": "jmxSource",
+            "type": "radio",
+            "label": "JMX Run File Source",
+            "required": true,
+            "defaultValue": "sourceCode",
+            "helpMarkDown": "Select Source for JMX File.",
+            "options": {
+              "sourceCode": "Source Code",
+              "url": "External URL"
+            }
+          },
+          {
+            "name": "jmxsourceRunFilePath",
+            "type": "filePath",
+            "label": "JMX Run File Source Path",
+            "defaultValue": "",
+            "helpMarkDown": "Path to the JMeter JMX file.",
+            "required": true,
+            "visibleRule": "jmxSource=sourceCode"
+          },
+          {
+            "name": "jmxsourceRunFileURL",
+            "type": "string",
+            "label": "JMX Run File Source URL",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Direct https Link to JMX File",
+            "visibleRule": "jmxSource=url"
+          },
+          {
+            "name": "jmxPropertySource",
+            "type": "radio",
+            "label": "JMX Property File Source",
+            "required": true,
+            "defaultValue": "sourceCode",
+            "helpMarkDown": "Select Source for JMX Properties File.",
+            "options": {
+              "none": "None",
+              "sourceCode": "Source Code",
+              "url": "External URL"
+            }
+          },
+          {
+            "name": "jmxPropertySourcePath",
+            "type": "filePath",
+            "label": "JMX Property Source Path",
+            "defaultValue": "",
+            "helpMarkDown": "Path to the JMeter JMX Property file.",
+            "required": true,
+            "visibleRule": "jmxPropertySource=sourceCode"
+          },
+          {
+            "name": "jmxPropertySourceURL",
+            "type": "string",
+            "label": "JMX Source URL",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Direct https Link to JMX Property File",
+            "visibleRule": "jmxPropertySource=url"
+          },
+          {
+            "name": "tokenRegex",
+            "type": "string",
+            "label": "Token Regex",
+            "defaultValue": "%(\\w+)%",
+            "helpMarkDown": "Regex to use for token replacement in JMX Property File. Must include a group match. The regex match should be return a group of 2 values, one with variable name second with variable and enclosure. Samples (Starts and ends with 1 underscore ==>  _(\\w+)_ ,Starts and ends with % ==>  %(\\w+)%)",
+            "required": true,
+            "visibleRule": "jmxPropertySource!=none"
+          },
+          {
+            "name": "jmxInputFilesSource",
+            "type": "radio",
+            "label": "JMX Input File Source(s)",
+            "required": true,
+            "defaultValue": "none",
+            "visibleRule": "jmxPropertySource!=none",
+            "helpMarkDown": "Select Source for JMX File Source(s) which might be required in JMX.",
+            "options": {
+                "none": "None",
+                "sourceCode": "Source Code Folder",
+                "urls": "External URL(s)"
+                }
+            },
+            {
+                "name": "jmxInputFolderSourcePath",
+                "type": "filePath",
+                "label": "JMX Input Folder Source",
+                "defaultValue": "",
+                "helpMarkDown": "Path to the JMeter JMX Input Folder. All Files in this folder will be avaiable to JMX. These file name(s) should be mentioned in property file as values and used in JMX with key.",
+                "required": true,
+                "visibleRule": "jmxInputFilesSource=sourceCode"
+            },
+            {
+                "name": "jmxInputFolderSourceUrls",
+                "type": "multiLine",
+                "label": "JMX Source URL",
+                "defaultValue": "",
+                "required": true,
+                "helpMarkDown": "Commma seperated file names {http url(s)} for JMX Input file required in JMX",
+                "visibleRule": "jmxInputFilesSource=urls"
+            }, 
+            {
+                "name": "copyResultToAzureBlobStorage",
+                "type": "boolean",
+                "label": "Copy Performance Test Result to Azure Blob Storage",
+                "defaultValue": "false",
+                "required": false,
+                "helpMarkDown": "Enabling this would help to copy Apache Jmeter's Performance Test Report, Log File and JTL File to be copied to Azure Blob Storage. Using Static website hosting turned on you can access any run report later as well."
+            },
+            {
+                "name": "ConnectedServiceNameSelector",
+                "aliases": [
+                    "azureConnectionType"
+                ],
+                "type": "pickList",
+                "label": "Azure Connection Type",
+                "required": false,
+                "helpMarkDown": "Azure connection authentication is required to post the results",
+                "defaultValue": "ConnectedServiceNameARM",
+                "visibleRule": "copyResultToAzureBlobStorage=true",
+                "options": {
+                    "ConnectedServiceNameARM": "Azure Resource Manager"
+                }
+            },
+            {
+                "name": "ConnectedServiceNameARM",
+                "aliases": [
+                    "azureSubscription"
+                ],
+                "type": "connectedService:AzureRM",
+                "label": "Azure Subscription",
+                "defaultValue": "",
+                "required": true,
+                "helpMarkDown": "Azure Resource Manager subscription to target for copying the files.",
+                "visibleRule": "ConnectedServiceNameSelector = ConnectedServiceNameARM && copyResultToAzureBlobStorage=true"
+            },
+            {
+                "name": "Destination",
+                "type": "pickList",
+                "label": "Destination Type",
+                "defaultValue": "AzureBlob",
+                "required": true,
+                "options": {
+                    "AzureBlob": "Azure Blob"
+                },
+                "helpMarkDown": "Select the destination, either Azure Blob or Azure VMs.",
+                "visibleRule": "copyResultToAzureBlobStorage=true"
+            },
+            {
+                "name": "StorageAccountRM",
+                "aliases": [
+                    "storage"
+                ],
+                "type": "pickList",
+                "label": "RM Storage Account",
+                "defaultValue": "",
+                "required": true,
+                "helpMarkDown": "Specify a pre-existing ARM storage account. It is also used as an intermediary for copying files to Azure VMs",
+                "properties": {
+                    "EditableOptions": "True"
+                },
+                "visibleRule": "ConnectedServiceNameSelector = ConnectedServiceNameARM && copyResultToAzureBlobStorage=true"
+            },   
+            {
+                "name": "ContainerName",
+                "type": "string",
+                "label": "Container Name",
+                "defaultValue": "$web",
+                "required": true,
+                "helpMarkDown": "Name of the Container for uploading the perforamnce test results. If a container with the given name does not exist in the specified storage account, it will automatically be created. <br> If you need to create a virtual directory inside the container, use the blob prefix input below. <br> Example: If your target location is <i>https://myaccount.blob.core.windows.net/mycontainer/vd1/vd2/</i>, then specify <i>mycontainer</i> as container name and <i>vd1/vd2</i> as blob prefix.",
+                "visibleRule": "Destination = AzureBlob && copyResultToAzureBlobStorage=true"
+            },
+            {
+                "name": "BlobPrefix",
+                "type": "string",
+                "label": "Blob Prefix",
+                "defaultValue": "Releases/Release_$(Build.BuildNumber)",
+                "required": false,
+                "helpMarkDown": "The prefix would be the location inside your container's $Web path where the result will be copied.",
+                "visibleRule": "Destination = AzureBlob && copyResultToAzureBlobStorage=true"
+            },
+            {
+                "name": "outputStorageUri",
+                "type": "string",
+                "label": "Storage Container URI",
+                "required": false,
+                "defaultValue": "",
+                "visibleRule": "Destination = AzureBlob && copyResultToAzureBlobStorage=true",
+                "helpMarkDown": "Enable 'Static Storage Hosting' on your storage container and provide the https exposed Primary endpoint URL in this field. This would enable to provide a direct link to your Performance Test Result."
+            },
+            {
+                "name": "jmeterURI",
+                "type": "string",
+                "label": "JMeter Download URL",
+                "required": true,
+                "defaultValue": "https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.5.tgz",
+                "groupName": "advanced",
+                "helpMarkDown": "Direct Download link of Apache JMeter tgz file."
+            },
+            {
+                "name": "jmeterFolderName",
+                "type": "string",
+                "label": "JMeter Folder Name",
+                "required": true,
+                "defaultValue": "apache-jmeter-5.5",
+                "groupName": "advanced",
+                "helpMarkDown": "Directory Name of folder when unzipped from the above 'Jmeter Download URL'"
+            },
+            {
+                "name": "jmeterLogFolder",
+                "type": "string",
+                "label": "JMeter Log Folder Name",
+                "required": true,
+                "defaultValue": "CurrentLog",
+                "groupName": "advanced",
+                "helpMarkDown": "Directory where logs will be maintained for Performance Test run under JMeter Bin."
+            },
+            {
+                "name": "jmeterReportFolder",
+                "type": "string",
+                "label": "JMeter Report Folder Name",
+                "required": true,
+                "defaultValue": "CurrentReport",
+                "groupName": "advanced",
+                "helpMarkDown": "Directory where reports will be maintained for Performance Test run under JMeter Bin."
+            }
+    ], 
+    "execution": {
+        "Node10": {
+            "target": "index.js"
+        }
+    }    
+}

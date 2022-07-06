@@ -1,0 +1,37 @@
+{
+  "name": "microsoftperfanalyzer",
+  "version": "1.0.0",
+  "description": "This task enables to run Performance testng using Apache Jmeter, Analyze report and post results",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx ts-node index.ts"
+  },
+  "author": "Prateek Mishra",
+  "license": "ISC",
+  "dependencies": {
+    "@azure/storage-blob": "^12.10.0",
+    "azure-pipelines-task-lib": "^3.3.1",
+    "azure-pipelines-tasks-azure-arm-rest-v2": "2.205.0",
+    "bluebird": "^3.7.2",
+    "child_process": "^1.0.2",
+    "fs": "0.0.1-security",
+    "https": "1.0.0",
+    "module": "^1.2.5",
+    "path": "0.12.7",
+    "process": "0.11.10",
+    "tar": "6.1.11",
+    "tar-stream": "2.2.0",
+    "tsc": "^2.0.4",
+    "unzip": "0.1.11",
+    "util": "^0.12.4"
+  },
+  "devDependencies": {
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^18.0.1",
+    "shelljs": "^0.8.5",
+    "sync-request": "^6.1.0",
+    "ts-node": "^10.8.2",
+    "typescript": "^4.7.4"
+  }
+}

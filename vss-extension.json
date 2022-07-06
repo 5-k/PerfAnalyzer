@@ -1,0 +1,34 @@
+{
+    "manifestVersion": 1,
+    "id": "f777aedf-a7f3-4700-8b55-ffe426cc252a",
+    "name": "Performance Analyzer",
+    "version": "0.1.10",
+    "publisher": "MishraPrateek123",
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],    
+    "description": "This task enables to run Performance testing using Apache Jmeter, Analyze report and post results. This task expects a valid JMX File, Any input Files, and property file for JMX.",
+    "categories": [
+        "Azure Pipelines"
+    ],
+    "icons": {
+        "default": "images/extension-icon.png"
+    },
+    "files": [
+        { "path": "perfanalyzer" }
+    ],
+    "contributions": [
+        {
+            "id": "custom-build-release-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "perfanalyzer"
+            }
+        }
+    ]
+}

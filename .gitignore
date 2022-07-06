@@ -1,0 +1,11 @@
+node_modules*
+perfanalyzer/node_modules*
+*.vsix
+package-lock.json
+.history*
+.vscode*
+perfanalyzer/.history*
+apache*
+perfanalyzer/apache*
+perfanalyzer/package-lock.json
+
