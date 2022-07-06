@@ -23,7 +23,34 @@ const LOG_JTL_FILE_NAME = 'log.jtl';
 const JMETER_LOG_FILE_NAME = 'jmeter.log'; 
 const JMETER_REPORT_INDEX_FILE_NAME = 'index.html';
 const URL_SEPERATOR = '/';
-
+enum InputVariables {
+    JMX_SOURCE = 'jmxSource',
+    JMX_SOURCE_RUN_FILE_SOURCE_PATH = 'jmxsourceRunFilePath',
+    JMX_SOURCE_RUN_FILE_URL ='jmxsourceRunFileURL',
+    JMX_PROPERTY_FILE_SOURCE = 'jmxPropertySource',
+    JMX_PROPERTY_FILE_SOURCE_PATH ='jmxPropertySourcePath',
+    JMX_PROPERTY_FILE_URL ='jmxPropertySourceURL',
+    JMX_INPUT_FILE_SOURCE = 'jmxInputFilesSource',
+    JMX_INPUT_FOLDER_SOURCE_PATH ='jmxInputFolderSourcePath',
+    JMX_INPUT_FILES_URL ='jmxInputFilesUrls',
+    JMX_BINARY_URI ='jmeterURI',
+    JMETER_FOLDER_NAME ='jmeterFolderName',
+    JMETER_LOG_FOLDER = 'jmeterLogFolder',
+    JMETER_REPORT_FOLDER = 'jmeterReportFolder',
+    COPY_RESULT_TO_AZURE_BLOB_STORAGE = 'copyResultToAzureBlobStorage',
+    TOKEN_REGEX = 'tokenRegex',
+    CONNECTED_SERVICE_ARM_NAME = 'ConnectedServiceNameARM',
+    STORAGE_ACCOUNT_RM = 'StorageAccountRM',
+    CONTAINER_NAME ='ContainerName',
+    BLOB_PREFIX = 'BlobPrefix',
+    OUTPUT_STORAGE_URI = 'outputStorageUri'
+}
+enum InputVariableType {
+    SourceCode = 'sourceCode',
+    Url = 'url',
+    Urls = 'urls',
+    None = 'none'
+}
 async function downloadFile(fileSource: string, destinationFilePath: string) {
     logInformation('Downloading File: ' + fileSource + ' to location: ' + destinationFilePath );
     return new Promise<void>((resolve, reject) => {
@@ -83,9 +110,9 @@ async function copyDir(src: string, dest: string):Promise<string[]> {
 
 async function handleJMeterJMXFile(JMETER_BIN_Folder: string): Promise<string|undefined|null>{
     
-    let jmxSourceInput = tl.getInput('jmxSource',true);
-    if(jmxSourceInput=='sourceCode') {
-        let jmxSourceRunFilePath = tl.getInput('jmxsourceRunFilePath',true); 
+    let jmxSourceInput = tl.getInput(InputVariables.JMX_SOURCE,true);
+    if(jmxSourceInput==InputVariableType.SourceCode) {
+        let jmxSourceRunFilePath = tl.getInput(InputVariables.JMX_SOURCE_RUN_FILE_SOURCE_PATH,true); 
         if(isEmpty(jmxSourceRunFilePath)) {
             tl.setResult(tl.TaskResult.Failed, "Missing Source File Path");
             return null;
@@ -96,7 +123,7 @@ async function handleJMeterJMXFile(JMETER_BIN_Folder: string): Promise<string|un
         await copyFileToDirectory(jmxSourceRunFilePath,destinationFilePath);
         return fileName;
     } else {
-        let jmxSourceRunFileURL = tl.getInput('jmxsourceRunFileURL',true);  
+        let jmxSourceRunFileURL = tl.getInput(InputVariables.JMX_SOURCE_RUN_FILE_URL,true);  
         if(isEmpty(jmxSourceRunFileURL)) {
             tl.setResult(tl.TaskResult.Failed, "Unable to find and download JMX From External URL");
             return null;
@@ -110,12 +137,12 @@ async function handleJMeterJMXFile(JMETER_BIN_Folder: string): Promise<string|un
 }
 async function handleJMeterPropertyFile(JMETER_BIN_Folder: string): Promise<string|undefined|null>{
     
-    let jmxPropertySource = tl.getInput('jmxPropertySource',true);  
-    if(jmxPropertySource == 'none') {
+    let jmxPropertySource = tl.getInput(InputVariables.JMX_PROPERTY_FILE_SOURCE,true);  
+    if(jmxPropertySource == InputVariableType.None) {
         logInformation("No Property File Input");
         return null;
-    } else if(jmxPropertySource=='sourceCode') {
-        let jmxPropertyFilePath = tl.getInput('jmxPropertySourcePath',true); 
+    } else if(jmxPropertySource== InputVariableType.SourceCode) {
+        let jmxPropertyFilePath = tl.getInput(InputVariables.JMX_PROPERTY_FILE_SOURCE_PATH,true); 
         if(isEmpty(jmxPropertyFilePath)) {
             tl.setResult(tl.TaskResult.Failed, "Missing Property File Path");
             return null;
@@ -126,7 +153,7 @@ async function handleJMeterPropertyFile(JMETER_BIN_Folder: string): Promise<stri
         await copyFileToDirectory(jmxPropertyFilePath,destinationFilePath);
         return fileName;
     } else {
-       let jmxPropertyFileURL = tl.getInput('jmxPropertySourceURL',true); 
+       let jmxPropertyFileURL = tl.getInput(InputVariables.JMX_PROPERTY_FILE_URL,true); 
          
        if(isEmpty(jmxPropertyFileURL)) {
             tl.setResult(tl.TaskResult.Failed, "Unable to find and download JMX Property File From External URL");
@@ -141,13 +168,13 @@ async function handleJMeterPropertyFile(JMETER_BIN_Folder: string): Promise<stri
 }   
 
 async function  handleJMeterInputFile(JMETER_BIN_Folder: string): Promise<string[]|null>{
-    let jmxInputFilesSource = tl.getInput('jmxInputFilesSource',true);
+    let jmxInputFilesSource = tl.getInput(InputVariables.JMX_INPUT_FILE_SOURCE,true);
     
-    if(jmxInputFilesSource=='none') {
+    if(jmxInputFilesSource==InputVariableType.None) {
        logInformation('Not downloading files');
        return null;
-    } else if(jmxInputFilesSource=='sourceCode') {
-        let jmxInputFolderSourcePath = tl.getInput('jmxInputFolderSourcePath',true); 
+    } else if(jmxInputFilesSource==InputVariableType.SourceCode) {
+        let jmxInputFolderSourcePath = tl.getInput(InputVariables.JMX_INPUT_FOLDER_SOURCE_PATH,true); 
         if(! jmxInputFolderSourcePath || jmxInputFolderSourcePath.length == 0) {
            tl.setResult(tl.TaskResult.Failed, "Unable to find and download JMX Input File From Source");
            return null;
@@ -155,7 +182,7 @@ async function  handleJMeterInputFile(JMETER_BIN_Folder: string): Promise<string
         logInformation('Downloading Input File(s) from source ' + jmxInputFolderSourcePath +  ' to destination' + JMETER_BIN_Folder);        
         return await copyDir(jmxInputFolderSourcePath, JMETER_BIN_Folder);             
     } else {
-        let jmxInputFolderSourceUrls= tl.getDelimitedInput('jmxInputFolderSourceUrls',',',true);
+        let jmxInputFolderSourceUrls= tl.getDelimitedInput(InputVariables.JMX_INPUT_FILES_URL,',',true);
         if(isEmpty(jmxInputFolderSourceUrls)) {
             tl.setResult(tl.TaskResult.Failed, "Missing User Input External URLs");
             return null;
@@ -185,8 +212,8 @@ async function  handleJMeterInputFile(JMETER_BIN_Folder: string): Promise<string
 }
 async function main() {
     try {
-        let JMETER_URL = tl.getInput('jmeterURI',true);
-        let JMETER_FILE_Folder = tl.getInput('jmeterFolderName',true);
+        let JMETER_URL = tl.getInput(InputVariables.JMX_BINARY_URI,true);
+        let JMETER_FILE_Folder = tl.getInput(InputVariables.JMETER_FOLDER_NAME,true);
         let JMETER_BIN_Folder = Path.join(JMETER_FILE_Folder, JMETER_BIN_Folder_NAME);
         let JMETER_ABS_BIN_Folder = Path.join( process.cwd(),JMETER_FILE_Folder, JMETER_BIN_Folder_NAME);
         
@@ -213,11 +240,11 @@ async function main() {
         let jmeterJMXFileName:string|null|undefined = await handleJMeterJMXFile(JMETER_ABS_BIN_Folder);
         logInformation('Completed handleJMeterJMXFile JMXFileName: '+ jmeterJMXFileName);        
 
-        let jmxPropertySource = tl.getInput('jmxPropertySource',true);
-        let jmxInputFilesSource = tl.getInput('jmxInputFilesSource',true);
+        let jmxPropertySource = tl.getInput(InputVariables.JMX_PROPERTY_FILE_SOURCE,true);
+        let jmxInputFilesSource = tl.getInput(InputVariables.JMX_INPUT_FILE_SOURCE,true);
         let jmeterPropertyFileName:string|null|undefined = null;
 
-        if(jmxPropertySource == 'none') {
+        if(jmxPropertySource == InputVariableType.None) {
             logInformation('No Property File Configuration Enabled. Skipping Property Configuration Step.')
         } else {
             logInformation('Start Handle Property Files. Current Working directory: ' + process.cwd());
@@ -230,7 +257,7 @@ async function main() {
             logInformation('Completed Handle Property Files jmeterPropertyFileName: '+ jmeterPropertyFileName)
         }
          
-        if(jmxInputFilesSource == 'none') {
+        if(jmxInputFilesSource == InputVariableType.None) {
             logInformation('No Input File Configuration Enabled. Skipping Input File Configuration Step.')
         } else {
             logInformation('Start Handle Input Files. Current Working directory: ' + process.cwd());
@@ -245,8 +272,8 @@ async function main() {
         }
 
 
-        let jmeterLogFolder = tl.getInput('jmeterLogFolder',true);
-        let jmeterReportFolder = tl.getInput('jmeterReportFolder',true);
+        let jmeterLogFolder = tl.getInput(InputVariables.JMETER_LOG_FOLDER,true);
+        let jmeterReportFolder = tl.getInput(InputVariables.JMETER_REPORT_FOLDER,true);
 
         if(isEmpty(jmeterLogFolder)) {
             jmeterLogFolder = DEFAULT_JMETER_LOG_DIR_NAME;
@@ -306,7 +333,7 @@ async function main() {
         });
         */
         const { stdout, stderr } = await promise2;
-        let copyToBlob = tl.getBoolInput('copyResultToAzureBlobStorage', true);
+        let copyToBlob = tl.getBoolInput(InputVariables.COPY_RESULT_TO_AZURE_BLOB_STORAGE, true);
         if(copyToBlob) {
             logInformation('Copying Test Results to Azure blob storage.')
             copyResultsToAzureBlob(jmeterReportFolder, jmeterLogFolder);
@@ -347,7 +374,7 @@ export async function replaceTokens(fileName: string | null | undefined) {
  
         var warningsAsErrors = true;
         
-        var tokenRegex = tl.getInput("tokenRegex", true); 
+        var tokenRegex = tl.getInput(InputVariables.TOKEN_REGEX, true); 
 
         const warning = warningsAsErrors ?
             (message: string) => { tl.error(message); errCount++ } :
@@ -416,8 +443,8 @@ export async function replaceTokens(fileName: string | null | undefined) {
 async function copyResultsToAzureBlob(reportFolderName: string, logFolderName: string) {
     
     logInformation('Starting copyResultsToAzureBlob')
-    let connectedServiceName = tl.getInput('ConnectedServiceNameARM', true);
-    let storageAccountName = tl.getInput('StorageAccountRM', true); 
+    let connectedServiceName = tl.getInput(InputVariables.CONNECTED_SERVICE_ARM_NAME, true);
+    let storageAccountName = tl.getInput(InputVariables.STORAGE_ACCOUNT_RM, true); 
     var azureEndpoint: AzureEndpoint = await new AzureRMEndpoint(connectedServiceName).getEndpoint();
     const storageArmClient = new armStorage.StorageManagementClient(azureEndpoint.applicationTokenCredentials, azureEndpoint.subscriptionID?? '');
     let storageAccount: StorageAccount = await storageArmClient.storageAccounts.get(storageAccountName);
@@ -428,14 +455,14 @@ async function copyResultsToAzureBlob(reportFolderName: string, logFolderName: s
     let storageAccountURI = AZURE_STORAGE_ACCOUNT_URI.replace(AZURE_STORAGE_ACCOUNT_NAME_PLACEHOLDER, storageAccountName);
     const cert = new StorageSharedKeyCredential(storageAccountName,accessKey);
     const blobServiceClient = new BlobServiceClient(storageAccountURI, cert) ;
-    let destContainerName = tl.getInput('ContainerName');
+    let destContainerName = tl.getInput(InputVariables.CONTAINER_NAME);
     if(!destContainerName || destContainerName.length == 0) {
-        logInformation('Missing required variable: ContainerName');
-        tl.setResult(tl.TaskResult.Failed, "Missing required variable: ContainerName");
+        logInformation('Missing required variable: ' + InputVariables.CONTAINER_NAME);
+        tl.setResult(tl.TaskResult.Failed, "Missing required variable: " + InputVariables.CONTAINER_NAME);
     }
     const destContainerClient = blobServiceClient.getContainerClient(destContainerName);    
 
-    let blobPrefix = tl.getInput('BlobPrefix');
+    let blobPrefix = tl.getInput(InputVariables.BLOB_PREFIX);
     
     let reportFolderABSPath = Path.join(process.cwd(), reportFolderName);
     logInformation('Uploading Reports to Blob Storage from path: ' + reportFolderABSPath + ' to BlobStorageAccount: ' + storageAccountName + ' and container Name: ' + destContainerName + " at path: " + Path.join(blobPrefix,reportFolderName));
@@ -445,7 +472,7 @@ async function copyResultsToAzureBlob(reportFolderName: string, logFolderName: s
     logInformation('Uploading Logs to Blob Storage from path: ' + logFolderABSPath + ' to BlobStorageAccount: ' + storageAccountName + ' and container Name: ' + destContainerName + " at path: " + Path.join(blobPrefix,logFolderName));
     await uploadBlob(logFolderABSPath, logFolderName, blobPrefix, destContainerClient);
     
-    let outputStorageUri = tl.getInput('outputStorageUri');
+    let outputStorageUri = tl.getInput(InputVariables.OUTPUT_STORAGE_URI);
     if(!outputStorageUri || outputStorageUri.length == 0) {
         logInformation('No Output Storage URL Provided. Hence unable to create performance test Result.')
     } else {
@@ -487,7 +514,6 @@ async function uploadBlob(src: string, uploadFolderName: string,  blobPrefix: st
                     }
                     const blockBlobClient = destContainerClient.getBlockBlobClient(path);
                     await blockBlobClient.uploadFile(srcPath, getBlobOptions(uploadFileName));    
-                    logInformation( "Blob " + uploadFileName +" was uploaded successfully top path: " + path );
                 }
             }
         }
@@ -521,10 +547,8 @@ function getBlobOptions(fileName: string) {
     } else if(fileName.endsWith('.json') || fileName.endsWith('.md') || fileName.endsWith('.less')) {
         type = 'text/plain';
     } else {
-        logInformation('Weird file type: ' + fileName);
         type = 'text/plain';
     }
-    logInformation('Returning MIME Type ' + type + 'for file ' + fileName)
     const blobOptions = { blobHTTPHeaders: { blobContentType: type } };
     return blobOptions;
 }
@@ -546,37 +570,9 @@ function isNonEmpty(str: string|undefined|null): boolean {
 }
 
 function logInformation(data: any) {
-    let currentTimeInMilliseconds=Date.now();
+    let currentTimeInMilliseconds=Date.now().toLocaleString();
     console.log(currentTimeInMilliseconds + ":" + data);
     tl.debug(currentTimeInMilliseconds + ":" + data)
 }
-
-async function test() {
-    let path = Path.join('apache-jmeter-5.4.3','bin')
-    await process.chdir(path);
-    let command = 'jmeter -q SAP_SearchPO_user.properties -n -t SAP_Search_Load_Test.jmx  -l CurrentLog\log.jtl -j CurrentLog\jmeter.log -f -e -o CurrentReport';
-    
-    
-    const promise = exec(command);
-    
-    const exec2 = util.promisify(require('child_process').exec);
-
-    const promise2 = exec2(command);
-    const child = promise.child; 
-    const child2 = promise2.child; 
-    child.stdout.on('data', function(data) {
-        logInformation(' stdout: ' + data);
-    });
-    child.stderr.on('data', function(data) {
-        logInformation(' stderr: ' + data);
-    });
-    child.on('close', function(code) {
-        logInformation(' closing code: ' + code);
-    });
-
-    const { stdout, stderr } = await promise;
-    logInformation('ok')
-    
-} 
+ 
 main();
-//test();

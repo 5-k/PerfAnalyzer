@@ -115,9 +115,9 @@
                 "visibleRule": "jmxInputFilesSource=sourceCode"
             },
             {
-                "name": "jmxInputFolderSourceUrls",
+                "name": "jmxInputFilesUrls",
                 "type": "multiLine",
-                "label": "JMX Source URL",
+                "label": "JMX Input File(s) Source URL",
                 "defaultValue": "",
                 "required": true,
                 "helpMarkDown": "Commma seperated file names {http url(s)} for JMX Input file required in JMX",
