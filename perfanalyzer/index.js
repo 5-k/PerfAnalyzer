@@ -58,6 +58,36 @@ var LOG_JTL_FILE_NAME = 'log.jtl';
 var JMETER_LOG_FILE_NAME = 'jmeter.log';
 var JMETER_REPORT_INDEX_FILE_NAME = 'index.html';
 var URL_SEPERATOR = '/';
+var InputVariables;
+(function (InputVariables) {
+    InputVariables["JMX_SOURCE"] = "jmxSource";
+    InputVariables["JMX_SOURCE_RUN_FILE_SOURCE_PATH"] = "jmxsourceRunFilePath";
+    InputVariables["JMX_SOURCE_RUN_FILE_URL"] = "jmxsourceRunFileURL";
+    InputVariables["JMX_PROPERTY_FILE_SOURCE"] = "jmxPropertySource";
+    InputVariables["JMX_PROPERTY_FILE_SOURCE_PATH"] = "jmxPropertySourcePath";
+    InputVariables["JMX_PROPERTY_FILE_URL"] = "jmxPropertySourceURL";
+    InputVariables["JMX_INPUT_FILE_SOURCE"] = "jmxInputFilesSource";
+    InputVariables["JMX_INPUT_FOLDER_SOURCE_PATH"] = "jmxInputFolderSourcePath";
+    InputVariables["JMX_INPUT_FILES_URL"] = "jmxInputFilesUrls";
+    InputVariables["JMX_BINARY_URI"] = "jmeterURI";
+    InputVariables["JMETER_FOLDER_NAME"] = "jmeterFolderName";
+    InputVariables["JMETER_LOG_FOLDER"] = "jmeterLogFolder";
+    InputVariables["JMETER_REPORT_FOLDER"] = "jmeterReportFolder";
+    InputVariables["COPY_RESULT_TO_AZURE_BLOB_STORAGE"] = "copyResultToAzureBlobStorage";
+    InputVariables["TOKEN_REGEX"] = "tokenRegex";
+    InputVariables["CONNECTED_SERVICE_ARM_NAME"] = "ConnectedServiceNameARM";
+    InputVariables["STORAGE_ACCOUNT_RM"] = "StorageAccountRM";
+    InputVariables["CONTAINER_NAME"] = "ContainerName";
+    InputVariables["BLOB_PREFIX"] = "BlobPrefix";
+    InputVariables["OUTPUT_STORAGE_URI"] = "outputStorageUri";
+})(InputVariables || (InputVariables = {}));
+var InputVariableType;
+(function (InputVariableType) {
+    InputVariableType["SourceCode"] = "sourceCode";
+    InputVariableType["Url"] = "url";
+    InputVariableType["Urls"] = "urls";
+    InputVariableType["None"] = "none";
+})(InputVariableType || (InputVariableType = {}));
 function downloadFile(fileSource, destinationFilePath) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
@@ -162,9 +192,9 @@ function handleJMeterJMXFile(JMETER_BIN_Folder) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    jmxSourceInput = tl.getInput('jmxSource', true);
-                    if (!(jmxSourceInput == 'sourceCode')) return [3 /*break*/, 2];
-                    jmxSourceRunFilePath = tl.getInput('jmxsourceRunFilePath', true);
+                    jmxSourceInput = tl.getInput(InputVariables.JMX_SOURCE, true);
+                    if (!(jmxSourceInput == InputVariableType.SourceCode)) return [3 /*break*/, 2];
+                    jmxSourceRunFilePath = tl.getInput(InputVariables.JMX_SOURCE_RUN_FILE_SOURCE_PATH, true);
                     if (isEmpty(jmxSourceRunFilePath)) {
                         tl.setResult(tl.TaskResult.Failed, "Missing Source File Path");
                         return [2 /*return*/, null];
@@ -177,7 +207,7 @@ function handleJMeterJMXFile(JMETER_BIN_Folder) {
                     _a.sent();
                     return [2 /*return*/, fileName];
                 case 2:
-                    jmxSourceRunFileURL = tl.getInput('jmxsourceRunFileURL', true);
+                    jmxSourceRunFileURL = tl.getInput(InputVariables.JMX_SOURCE_RUN_FILE_URL, true);
                     if (isEmpty(jmxSourceRunFileURL)) {
                         tl.setResult(tl.TaskResult.Failed, "Unable to find and download JMX From External URL");
                         return [2 /*return*/, null];
@@ -199,13 +229,13 @@ function handleJMeterPropertyFile(JMETER_BIN_Folder) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    jmxPropertySource = tl.getInput('jmxPropertySource', true);
-                    if (!(jmxPropertySource == 'none')) return [3 /*break*/, 1];
+                    jmxPropertySource = tl.getInput(InputVariables.JMX_PROPERTY_FILE_SOURCE, true);
+                    if (!(jmxPropertySource == InputVariableType.None)) return [3 /*break*/, 1];
                     logInformation("No Property File Input");
                     return [2 /*return*/, null];
                 case 1:
-                    if (!(jmxPropertySource == 'sourceCode')) return [3 /*break*/, 3];
-                    jmxPropertyFilePath = tl.getInput('jmxPropertySourcePath', true);
+                    if (!(jmxPropertySource == InputVariableType.SourceCode)) return [3 /*break*/, 3];
+                    jmxPropertyFilePath = tl.getInput(InputVariables.JMX_PROPERTY_FILE_SOURCE_PATH, true);
                     if (isEmpty(jmxPropertyFilePath)) {
                         tl.setResult(tl.TaskResult.Failed, "Missing Property File Path");
                         return [2 /*return*/, null];
@@ -218,7 +248,7 @@ function handleJMeterPropertyFile(JMETER_BIN_Folder) {
                     _a.sent();
                     return [2 /*return*/, fileName];
                 case 3:
-                    jmxPropertyFileURL = tl.getInput('jmxPropertySourceURL', true);
+                    jmxPropertyFileURL = tl.getInput(InputVariables.JMX_PROPERTY_FILE_URL, true);
                     if (isEmpty(jmxPropertyFileURL)) {
                         tl.setResult(tl.TaskResult.Failed, "Unable to find and download JMX Property File From External URL");
                         return [2 /*return*/];
@@ -240,13 +270,13 @@ function handleJMeterInputFile(JMETER_BIN_Folder) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    jmxInputFilesSource = tl.getInput('jmxInputFilesSource', true);
-                    if (!(jmxInputFilesSource == 'none')) return [3 /*break*/, 1];
+                    jmxInputFilesSource = tl.getInput(InputVariables.JMX_INPUT_FILE_SOURCE, true);
+                    if (!(jmxInputFilesSource == InputVariableType.None)) return [3 /*break*/, 1];
                     logInformation('Not downloading files');
                     return [2 /*return*/, null];
                 case 1:
-                    if (!(jmxInputFilesSource == 'sourceCode')) return [3 /*break*/, 3];
-                    jmxInputFolderSourcePath = tl.getInput('jmxInputFolderSourcePath', true);
+                    if (!(jmxInputFilesSource == InputVariableType.SourceCode)) return [3 /*break*/, 3];
+                    jmxInputFolderSourcePath = tl.getInput(InputVariables.JMX_INPUT_FOLDER_SOURCE_PATH, true);
                     if (!jmxInputFolderSourcePath || jmxInputFolderSourcePath.length == 0) {
                         tl.setResult(tl.TaskResult.Failed, "Unable to find and download JMX Input File From Source");
                         return [2 /*return*/, null];
@@ -255,7 +285,7 @@ function handleJMeterInputFile(JMETER_BIN_Folder) {
                     return [4 /*yield*/, copyDir(jmxInputFolderSourcePath, JMETER_BIN_Folder)];
                 case 2: return [2 /*return*/, _a.sent()];
                 case 3:
-                    jmxInputFolderSourceUrls = tl.getDelimitedInput('jmxInputFolderSourceUrls', ',', true);
+                    jmxInputFolderSourceUrls = tl.getDelimitedInput(InputVariables.JMX_INPUT_FILES_URL, ',', true);
                     if (isEmpty(jmxInputFolderSourceUrls)) {
                         tl.setResult(tl.TaskResult.Failed, "Missing User Input External URLs");
                         return [2 /*return*/, null];
@@ -302,8 +332,8 @@ function main() {
             switch (_b.label) {
                 case 0:
                     _b.trys.push([0, 15, , 16]);
-                    JMETER_URL = tl.getInput('jmeterURI', true);
-                    JMETER_FILE_Folder = tl.getInput('jmeterFolderName', true);
+                    JMETER_URL = tl.getInput(InputVariables.JMX_BINARY_URI, true);
+                    JMETER_FILE_Folder = tl.getInput(InputVariables.JMETER_FOLDER_NAME, true);
                     JMETER_BIN_Folder = Path.join(JMETER_FILE_Folder, JMETER_BIN_Folder_NAME);
                     JMETER_ABS_BIN_Folder = Path.join(process.cwd(), JMETER_FILE_Folder, JMETER_BIN_Folder_NAME);
                     logInformation('Current Working directory: ' + process.cwd());
@@ -331,10 +361,10 @@ function main() {
                 case 4:
                     jmeterJMXFileName = _b.sent();
                     logInformation('Completed handleJMeterJMXFile JMXFileName: ' + jmeterJMXFileName);
-                    jmxPropertySource = tl.getInput('jmxPropertySource', true);
-                    jmxInputFilesSource = tl.getInput('jmxInputFilesSource', true);
+                    jmxPropertySource = tl.getInput(InputVariables.JMX_PROPERTY_FILE_SOURCE, true);
+                    jmxInputFilesSource = tl.getInput(InputVariables.JMX_INPUT_FILE_SOURCE, true);
                     jmeterPropertyFileName = null;
-                    if (!(jmxPropertySource == 'none')) return [3 /*break*/, 5];
+                    if (!(jmxPropertySource == InputVariableType.None)) return [3 /*break*/, 5];
                     logInformation('No Property File Configuration Enabled. Skipping Property Configuration Step.');
                     return [3 /*break*/, 7];
                 case 5:
@@ -350,7 +380,7 @@ function main() {
                     logInformation('Completed Handle Property Files jmeterPropertyFileName: ' + jmeterPropertyFileName);
                     _b.label = 7;
                 case 7:
-                    if (!(jmxInputFilesSource == 'none')) return [3 /*break*/, 8];
+                    if (!(jmxInputFilesSource == InputVariableType.None)) return [3 /*break*/, 8];
                     logInformation('No Input File Configuration Enabled. Skipping Input File Configuration Step.');
                     return [3 /*break*/, 10];
                 case 8:
@@ -366,8 +396,8 @@ function main() {
                     }
                     _b.label = 10;
                 case 10:
-                    jmeterLogFolder = tl.getInput('jmeterLogFolder', true);
-                    jmeterReportFolder = tl.getInput('jmeterReportFolder', true);
+                    jmeterLogFolder = tl.getInput(InputVariables.JMETER_LOG_FOLDER, true);
+                    jmeterReportFolder = tl.getInput(InputVariables.JMETER_REPORT_FOLDER, true);
                     if (isEmpty(jmeterLogFolder)) {
                         jmeterLogFolder = DEFAULT_JMETER_LOG_DIR_NAME;
                         logInformation('Missing JMeter Log Folder Name. Using ' + DEFAULT_JMETER_LOG_DIR_NAME + ' as default name.');
@@ -398,7 +428,7 @@ function main() {
                     return [4 /*yield*/, promise2];
                 case 14:
                     _a = _b.sent(), stdout = _a.stdout, stderr = _a.stderr;
-                    copyToBlob = tl.getBoolInput('copyResultToAzureBlobStorage', true);
+                    copyToBlob = tl.getBoolInput(InputVariables.COPY_RESULT_TO_AZURE_BLOB_STORAGE, true);
                     if (copyToBlob) {
                         logInformation('Copying Test Results to Azure blob storage.');
                         copyResultsToAzureBlob(jmeterReportFolder, jmeterLogFolder);
@@ -436,7 +466,7 @@ function replaceTokens(fileName) {
                 }
                 tl.checkPath(sourcePath, "sourcePath");
                 warningsAsErrors = true;
-                tokenRegex = tl.getInput("tokenRegex", true);
+                tokenRegex = tl.getInput(InputVariables.TOKEN_REGEX, true);
                 warning = warningsAsErrors ?
                     function (message) { tl.error(message); errCount++; } :
                     function (message) { return tl.warning(message); };
@@ -502,8 +532,8 @@ function copyResultsToAzureBlob(reportFolderName, logFolderName) {
             switch (_b.label) {
                 case 0:
                     logInformation('Starting copyResultsToAzureBlob');
-                    connectedServiceName = tl.getInput('ConnectedServiceNameARM', true);
-                    storageAccountName = tl.getInput('StorageAccountRM', true);
+                    connectedServiceName = tl.getInput(InputVariables.CONNECTED_SERVICE_ARM_NAME, true);
+                    storageAccountName = tl.getInput(InputVariables.STORAGE_ACCOUNT_RM, true);
                     return [4 /*yield*/, new azure_arm_endpoint_1.AzureRMEndpoint(connectedServiceName).getEndpoint()];
                 case 1:
                     azureEndpoint = _b.sent();
@@ -519,13 +549,13 @@ function copyResultsToAzureBlob(reportFolderName, logFolderName) {
                     storageAccountURI = AZURE_STORAGE_ACCOUNT_URI.replace(AZURE_STORAGE_ACCOUNT_NAME_PLACEHOLDER, storageAccountName);
                     cert = new StorageSharedKeyCredential(storageAccountName, accessKey);
                     blobServiceClient = new BlobServiceClient(storageAccountURI, cert);
-                    destContainerName = tl.getInput('ContainerName');
+                    destContainerName = tl.getInput(InputVariables.CONTAINER_NAME);
                     if (!destContainerName || destContainerName.length == 0) {
-                        logInformation('Missing required variable: ContainerName');
-                        tl.setResult(tl.TaskResult.Failed, "Missing required variable: ContainerName");
+                        logInformation('Missing required variable: ' + InputVariables.CONTAINER_NAME);
+                        tl.setResult(tl.TaskResult.Failed, "Missing required variable: " + InputVariables.CONTAINER_NAME);
                     }
                     destContainerClient = blobServiceClient.getContainerClient(destContainerName);
-                    blobPrefix = tl.getInput('BlobPrefix');
+                    blobPrefix = tl.getInput(InputVariables.BLOB_PREFIX);
                     reportFolderABSPath = Path.join(process.cwd(), reportFolderName);
                     logInformation('Uploading Reports to Blob Storage from path: ' + reportFolderABSPath + ' to BlobStorageAccount: ' + storageAccountName + ' and container Name: ' + destContainerName + " at path: " + Path.join(blobPrefix, reportFolderName));
                     return [4 /*yield*/, uploadBlob(reportFolderABSPath, reportFolderName, blobPrefix, destContainerClient)];
@@ -536,7 +566,7 @@ function copyResultsToAzureBlob(reportFolderName, logFolderName) {
                     return [4 /*yield*/, uploadBlob(logFolderABSPath, logFolderName, blobPrefix, destContainerClient)];
                 case 5:
                     _b.sent();
-                    outputStorageUri = tl.getInput('outputStorageUri');
+                    outputStorageUri = tl.getInput(InputVariables.OUTPUT_STORAGE_URI);
                     if (!outputStorageUri || outputStorageUri.length == 0) {
                         logInformation('No Output Storage URL Provided. Hence unable to create performance test Result.');
                     }
@@ -597,7 +627,6 @@ function uploadBlob(src, uploadFolderName, blobPrefix, destContainerClient) {
                                     return [4 /*yield*/, blockBlobClient.uploadFile(srcPath, getBlobOptions(uploadFileName))];
                                 case 5:
                                     _a.sent();
-                                    logInformation("Blob " + uploadFileName + " was uploaded successfully top path: " + path);
                                     _a.label = 6;
                                 case 6:
                                     _i++;
@@ -652,10 +681,8 @@ function getBlobOptions(fileName) {
         type = 'text/plain';
     }
     else {
-        logInformation('Weird file type: ' + fileName);
         type = 'text/plain';
     }
-    logInformation('Returning MIME Type ' + type + 'for file ' + fileName);
     var blobOptions = { blobHTTPHeaders: { blobContentType: type } };
     return blobOptions;
 }
@@ -673,43 +700,8 @@ function isNonEmpty(str) {
     return !isEmpty(str);
 }
 function logInformation(data) {
-    var currentTimeInMilliseconds = Date.now();
+    var currentTimeInMilliseconds = Date.now().toLocaleString();
     console.log(currentTimeInMilliseconds + ":" + data);
     tl.debug(currentTimeInMilliseconds + ":" + data);
 }
-function test() {
-    return __awaiter(this, void 0, void 0, function () {
-        var path, command, promise, exec2, promise2, child, child2, _a, stdout, stderr;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0:
-                    path = Path.join('apache-jmeter-5.4.3', 'bin');
-                    return [4 /*yield*/, process.chdir(path)];
-                case 1:
-                    _b.sent();
-                    command = 'jmeter -q SAP_SearchPO_user.properties -n -t SAP_Search_Load_Test.jmx  -l CurrentLog\log.jtl -j CurrentLog\jmeter.log -f -e -o CurrentReport';
-                    promise = exec(command);
-                    exec2 = util.promisify(require('child_process').exec);
-                    promise2 = exec2(command);
-                    child = promise.child;
-                    child2 = promise2.child;
-                    child.stdout.on('data', function (data) {
-                        logInformation(' stdout: ' + data);
-                    });
-                    child.stderr.on('data', function (data) {
-                        logInformation(' stderr: ' + data);
-                    });
-                    child.on('close', function (code) {
-                        logInformation(' closing code: ' + code);
-                    });
-                    return [4 /*yield*/, promise];
-                case 2:
-                    _a = _b.sent(), stdout = _a.stdout, stderr = _a.stderr;
-                    logInformation('ok');
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
 main();
-//test();
