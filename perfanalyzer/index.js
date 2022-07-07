@@ -43,7 +43,6 @@ var fs = require('fs');
 var tar = require('tar');
 var Path = require('path');
 var sh = require('shelljs');
-var util = require('util');
 var exec = require('child_process').exec;
 var moment = require("moment");
 var JMETER_FILE_NAME = 'apache-jmeter.tgz';
@@ -76,12 +75,15 @@ var InputVariables;
     InputVariables["JMETER_LOG_FOLDER"] = "jmeterLogFolder";
     InputVariables["JMETER_REPORT_FOLDER"] = "jmeterReportFolder";
     InputVariables["COPY_RESULT_TO_AZURE_BLOB_STORAGE"] = "copyResultToAzureBlobStorage";
+    InputVariables["PUBLISH_RESULTS_TO_BUILD_ARTIFACT"] = "publishResultsToBuildArtifact";
     InputVariables["TOKEN_REGEX"] = "tokenRegex";
     InputVariables["CONNECTED_SERVICE_ARM_NAME"] = "ConnectedServiceNameARM";
     InputVariables["STORAGE_ACCOUNT_RM"] = "StorageAccountRM";
     InputVariables["CONTAINER_NAME"] = "ContainerName";
     InputVariables["BLOB_PREFIX"] = "BlobPrefix";
     InputVariables["OUTPUT_STORAGE_URI"] = "outputStorageUri";
+    InputVariables["ARTIFACT_NAME_REPORT"] = "artifactNameReport";
+    InputVariables["ARTIFACT_NAME_LOG"] = "artifactNameLog";
 })(InputVariables || (InputVariables = {}));
 var InputVariableType;
 (function (InputVariableType) {
@@ -293,7 +295,7 @@ function promiseFromChildProcess(child) {
 }
 function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var JMETER_URL, JMETER_FILE_Folder, JMETER_BIN_Folder, JMETER_ABS_BIN_Folder, jmeterJMXFileName, jmxPropertySource, jmxInputFilesSource, jmeterPropertyFileName, jmeterInputFileNames, jmeterLogFolder_1, jmeterReportFolder_1, command, CurrentLogJTLFile, CurrentLogLogFile, child, _a, stdout, stderr, err_1;
+        var JMETER_URL, JMETER_FILE_Folder, JMETER_BIN_Folder, JMETER_ABS_BIN_Folder_1, jmeterJMXFileName, jmxPropertySource, jmxInputFilesSource, jmeterPropertyFileName, jmeterInputFileNames, jmeterLogFolder_1, jmeterReportFolder_1, command, CurrentLogJTLFile, CurrentLogLogFile, child, _a, stdout, stderr, err_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -301,12 +303,12 @@ function main() {
                     JMETER_URL = tl.getInput(InputVariables.JMX_BINARY_URI, true);
                     JMETER_FILE_Folder = tl.getInput(InputVariables.JMETER_FOLDER_NAME, true);
                     JMETER_BIN_Folder = Path.join(JMETER_FILE_Folder, JMETER_BIN_Folder_NAME);
-                    JMETER_ABS_BIN_Folder = Path.join(process.cwd(), JMETER_FILE_Folder, JMETER_BIN_Folder_NAME);
+                    JMETER_ABS_BIN_Folder_1 = Path.join(process.cwd(), JMETER_FILE_Folder, JMETER_BIN_Folder_NAME);
                     logInformation('Current Working directory: ' + process.cwd());
                     logInformation('JMETER_URL ' + JMETER_URL);
                     logInformation('JMETER_FILE_Folder ' + JMETER_FILE_Folder);
                     logInformation('JMETER_BIN_Folder ' + JMETER_BIN_Folder);
-                    logInformation('JMETER_ABS_BIN_Folder ' + JMETER_ABS_BIN_Folder);
+                    logInformation('JMETER_ABS_BIN_Folder ' + JMETER_ABS_BIN_Folder_1);
                     logInformation('Current Working directory: ' + process.cwd());
                     logInformation('Start Downloading JMeter Binary');
                     return [4 /*yield*/, downloadFile(JMETER_URL, JMETER_FILE_NAME)];
@@ -318,12 +320,12 @@ function main() {
                 case 2:
                     _b.sent();
                     logInformation('Completed Unzipping JMeter Binary');
-                    return [4 /*yield*/, process.chdir(JMETER_ABS_BIN_Folder)];
+                    return [4 /*yield*/, process.chdir(JMETER_ABS_BIN_Folder_1)];
                 case 3:
                     _b.sent();
-                    logInformation('Change Directory to JMeter Bin Path ' + JMETER_ABS_BIN_Folder + ' completed. Current Working Directory: ' + process.cwd());
+                    logInformation('Change Directory to JMeter Bin Path ' + JMETER_ABS_BIN_Folder_1 + ' completed. Current Working Directory: ' + process.cwd());
                     logInformation('Start handleJMeterJMXFile. Current Working directory' + process.cwd());
-                    return [4 /*yield*/, handleJMeterJMXFile(JMETER_ABS_BIN_Folder)];
+                    return [4 /*yield*/, handleJMeterJMXFile(JMETER_ABS_BIN_Folder_1)];
                 case 4:
                     jmeterJMXFileName = _b.sent();
                     logInformation('Completed handleJMeterJMXFile JMXFileName: ' + jmeterJMXFileName);
@@ -335,7 +337,7 @@ function main() {
                     return [3 /*break*/, 7];
                 case 5:
                     logInformation('Start Handle Property Files. Current Working directory: ' + process.cwd());
-                    return [4 /*yield*/, handleJMeterPropertyFile(JMETER_ABS_BIN_Folder)];
+                    return [4 /*yield*/, handleJMeterPropertyFile(JMETER_ABS_BIN_Folder_1)];
                 case 6:
                     jmeterPropertyFileName = _b.sent();
                     if (isEmpty(jmeterPropertyFileName)) {
@@ -351,7 +353,7 @@ function main() {
                     return [3 /*break*/, 10];
                 case 8:
                     logInformation('Start Handle Input Files. Current Working directory: ' + process.cwd());
-                    return [4 /*yield*/, handleJMeterInputFile(JMETER_ABS_BIN_Folder)];
+                    return [4 /*yield*/, handleJMeterInputFile(JMETER_ABS_BIN_Folder_1)];
                 case 9:
                     jmeterInputFileNames = _b.sent();
                     logInformation('Completed Handle Input Files. FileCount: ' + ((null != jmeterInputFileNames) ? jmeterInputFileNames === null || jmeterInputFileNames === void 0 ? void 0 : jmeterInputFileNames.length : 0));
@@ -387,10 +389,31 @@ function main() {
                     child = exec(command);
                     promiseFromChildProcess(child).then(function (result) {
                         logInformation('promise complete: ' + result);
-                        var copyToBlob = tl.getBoolInput(InputVariables.COPY_RESULT_TO_AZURE_BLOB_STORAGE, true);
-                        if (copyToBlob) {
-                            logInformation('Copying Test Results to Azure blob storage.');
-                            copyResultsToAzureBlob(jmeterReportFolder_1, jmeterLogFolder_1);
+                        try {
+                            var copyToBlob = tl.getBoolInput(InputVariables.COPY_RESULT_TO_AZURE_BLOB_STORAGE, true);
+                            if (copyToBlob) {
+                                logInformation('Copying Test Results to Azure blob storage.');
+                                copyResultsToAzureBlob(jmeterReportFolder_1, jmeterLogFolder_1);
+                            }
+                        }
+                        catch (e) {
+                            logInformation('Error Publishing report to blob storage: ' + (e === null || e === void 0 ? void 0 : e.message));
+                        }
+                        var ReportABSPath = Path.join(JMETER_ABS_BIN_Folder_1, jmeterReportFolder_1);
+                        var LogABSPath = Path.join(JMETER_ABS_BIN_Folder_1, jmeterReportFolder_1);
+                        try {
+                            var publishResultsToBuildArtifact = tl.getBoolInput(InputVariables.PUBLISH_RESULTS_TO_BUILD_ARTIFACT, true);
+                            if (publishResultsToBuildArtifact) {
+                                var artifactReport = tl.getInput(InputVariables.ARTIFACT_NAME_REPORT, true);
+                                var artifactLOG = tl.getInput(InputVariables.ARTIFACT_NAME_LOG, true);
+                                logInformation('Publishing data to build artifacts');
+                                publishData(ReportABSPath, artifactReport);
+                                publishData(LogABSPath, artifactLOG);
+                            }
+                        }
+                        catch (e) {
+                            logInformation('Error Publishing report: ' + (e === null || e === void 0 ? void 0 : e.message));
+                            logInformation('Artifacts {Report} are present at location: ' + ReportABSPath + ' and {Logs} at location: ' + LogABSPath);
                         }
                         logInformation('Task Completed.');
                     }, function (err) {
@@ -613,6 +636,30 @@ function uploadBlob(src, uploadFolderName, blobPrefix, destContainerClient) {
                     _a.sent();
                     return [2 /*return*/];
             }
+        });
+    });
+}
+function publishData(pathToPublish, artifactName) {
+    return __awaiter(this, void 0, void 0, function () {
+        var hostType, data;
+        return __generator(this, function (_a) {
+            logInformation('Started Uploading Artifacts from : ' + pathToPublish + ' to location: ' + pathToPublish);
+            tl.setResourcePath(Path.join(__dirname, 'task.json'));
+            logInformation('ResourcePath: ' + Path.join(__dirname, 'task.json'));
+            hostType = tl.getVariable('system.hostType');
+            if ((hostType && hostType.toUpperCase() != 'BUILD')) {
+                logInformation('Unable to upload Result: ErrorHostTypeNotSupported');
+                return [2 /*return*/];
+            }
+            data = {
+                artifacttype: 'Container',
+                artifactname: artifactName
+            };
+            data["containerfolder"] = artifactName;
+            data["localpath"] = pathToPublish;
+            tl.command("artifact.upload", data, pathToPublish);
+            logInformation('Completed Uploading Artifacts from : ' + pathToPublish + ' to location: ' + pathToPublish);
+            return [2 /*return*/];
         });
     });
 }

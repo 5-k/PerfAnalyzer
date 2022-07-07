@@ -1,20 +1,17 @@
-import sh from 'shelljs'; 
 const tl = require('azure-pipelines-task-lib/task'); 
 const https = require('https');
 const fs = require('fs');
 var tar = require('tar');
 const Path = require('path'); 
 const sh = require('shelljs'); 
-const util = require('util');
 var exec = require('child_process').exec;
-import * as moment from 'moment';
-
+import * as moment from 'moment'; 
 const JMETER_FILE_NAME='apache-jmeter.tgz'
 const JMETER_BIN_Folder_NAME= 'bin'  
 const armStorage = require('azure-pipelines-tasks-azure-arm-rest-v2/azure-arm-storage');  
 import { AzureRMEndpoint } from 'azure-pipelines-tasks-azure-arm-rest-v2/azure-arm-endpoint';
 import { AzureEndpoint, StorageAccount } from 'azure-pipelines-tasks-azure-arm-rest-v2/azureModels';
-import { BlobServiceClient, StorageSharedKeyCredential, BlockBlobParallelUploadOptions, BlobHTTPHeaders } from "@azure/storage-blob";
+import { BlobServiceClient, StorageSharedKeyCredential } from "@azure/storage-blob";
 const DATE_FORMAT = 'DD-MMM-YYYY HH:mm:ss:SSS ZZ';
 
 const DEFAULT_JMETER_REPORT_DIR_NAME = "CurrentReport";
@@ -24,7 +21,8 @@ const AZURE_STORAGE_ACCOUNT_NAME_PLACEHOLDER = '${storageAccountName}';
 const LOG_JTL_FILE_NAME = 'log.jtl';
 const JMETER_LOG_FILE_NAME = 'jmeter.log'; 
 const JMETER_REPORT_INDEX_FILE_NAME = 'index.html';
-const URL_SEPERATOR = '/';
+const URL_SEPERATOR = '/'; 
+
 enum InputVariables {
     JMX_SOURCE = 'jmxSource',
     JMX_SOURCE_RUN_FILE_SOURCE_PATH = 'jmxsourceRunFilePath',
@@ -40,12 +38,15 @@ enum InputVariables {
     JMETER_LOG_FOLDER = 'jmeterLogFolder',
     JMETER_REPORT_FOLDER = 'jmeterReportFolder',
     COPY_RESULT_TO_AZURE_BLOB_STORAGE = 'copyResultToAzureBlobStorage',
+    PUBLISH_RESULTS_TO_BUILD_ARTIFACT = 'publishResultsToBuildArtifact',
     TOKEN_REGEX = 'tokenRegex',
     CONNECTED_SERVICE_ARM_NAME = 'ConnectedServiceNameARM',
     STORAGE_ACCOUNT_RM = 'StorageAccountRM',
     CONTAINER_NAME ='ContainerName',
     BLOB_PREFIX = 'BlobPrefix',
-    OUTPUT_STORAGE_URI = 'outputStorageUri'
+    OUTPUT_STORAGE_URI = 'outputStorageUri',
+    ARTIFACT_NAME_REPORT = 'artifactNameReport',
+    ARTIFACT_NAME_LOG = 'artifactNameLog'
 }
 enum InputVariableType {
     SourceCode = 'sourceCode',
@@ -303,13 +304,38 @@ async function main() {
 
         var child = exec(command);
         promiseFromChildProcess(child).then(function (result) {
-            logInformation('promise complete: ' + result);
-            let copyToBlob = tl.getBoolInput(InputVariables.COPY_RESULT_TO_AZURE_BLOB_STORAGE, true);
-            if(copyToBlob) {
-                logInformation('Copying Test Results to Azure blob storage.')
-                copyResultsToAzureBlob(jmeterReportFolder, jmeterLogFolder);
+            logInformation('promise complete: ' + result); 
+
+            try { 
+                let copyToBlob = tl.getBoolInput(InputVariables.COPY_RESULT_TO_AZURE_BLOB_STORAGE, true);
+                if(copyToBlob) {
+                    logInformation('Copying Test Results to Azure blob storage.')
+                    copyResultsToAzureBlob(jmeterReportFolder, jmeterLogFolder);
+                } 
+            } catch (e) {
+                logInformation('Error Publishing report to blob storage: ' + e?.message)
             }
             
+            let ReportABSPath = Path.join(JMETER_ABS_BIN_Folder,jmeterReportFolder);
+            let LogABSPath = Path.join(JMETER_ABS_BIN_Folder,jmeterReportFolder);
+
+            try { 
+                let publishResultsToBuildArtifact = tl.getBoolInput(InputVariables.PUBLISH_RESULTS_TO_BUILD_ARTIFACT, true);
+                
+                if(publishResultsToBuildArtifact) {
+                    let artifactReport = tl.getInput(InputVariables.ARTIFACT_NAME_REPORT,true);
+                    let artifactLOG = tl.getInput(InputVariables.ARTIFACT_NAME_LOG,true);                
+
+                    logInformation('Publishing data to build artifacts')
+                    publishData(ReportABSPath, artifactReport);
+                    publishData(LogABSPath, artifactLOG);
+                }
+                 
+            } catch (e) {
+                logInformation('Error Publishing report: ' + e?.message);
+                logInformation('Artifacts {Report} are present at location: ' + ReportABSPath + ' and {Logs} at location: ' + LogABSPath);
+            }
+           
             logInformation('Task Completed.')
         }, function (err) {
             logInformation('promise rejected: ' + err);
@@ -506,6 +532,27 @@ async function uploadBlob(src: string, uploadFolderName: string,  blobPrefix: st
     }); 
 }
 
+async function publishData(pathToPublish: string, artifactName: string) {
+    logInformation('Started Uploading Artifacts from : ' + pathToPublish + ' to location: ' + pathToPublish);
+    tl.setResourcePath(Path.join(__dirname, 'task.json')); 
+    logInformation('ResourcePath: ' + Path.join(__dirname, 'task.json'));
+    let hostType = tl.getVariable('system.hostType');
+    if ((hostType && hostType.toUpperCase() != 'BUILD')) {
+        logInformation('Unable to upload Result: ErrorHostTypeNotSupported');
+        return;
+    }
+
+    let data = {
+        artifacttype: 'Container',
+        artifactname: artifactName
+    };
+    data["containerfolder"] = artifactName;
+
+    
+    data["localpath"] = pathToPublish;
+    tl.command("artifact.upload", data, pathToPublish);
+    logInformation('Completed Uploading Artifacts from : ' + pathToPublish + ' to location: ' + pathToPublish);
+}
 function getBlobOptions(fileName: string) {
     let type= '';
     if(fileName.endsWith('.html') || fileName.endsWith('.htm')) {

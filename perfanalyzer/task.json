@@ -10,7 +10,7 @@
     "version": {
         "Major": 1,
         "Minor": 0,
-        "Patch": 26
+        "Patch": 32
     },
     "instanceNameFormat": "Run Perf Analyzer",
     "groups": [
@@ -123,6 +123,30 @@
                 "helpMarkDown": "Commma seperated file names {http url(s)} for JMX Input file required in JMX",
                 "visibleRule": "jmxInputFilesSource=urls"
             }, 
+            {
+                "name": "publishResultsToBuildArtifact",
+                "type": "boolean",
+                "label": "Publish Logs and Test Results to Pipeline Artifacts",
+                "defaultValue": "true",
+                "required": true,
+                "helpMarkDown": "This would publish the output the data to build artifacts."
+            },
+            {
+                "name": "artifactNameReport",
+                "type": "string",
+                "label": "Artifact Name for Apache Jmeter Reports",
+                "defaultValue": "PerfAnalyzerReport",
+                "required": true,
+                "helpMarkDown": "This name would be used to publish to build report artifacts."
+            },
+            {
+                "name": "artifactNameLog",
+                "type": "string",
+                "label": "Artifact Name for Apache Jmeter Logs",
+                "defaultValue": "PerfAnalyzerLogs",
+                "required": true,
+                "helpMarkDown": "This name would be used to publish to build log artifacts."
+            },
             {
                 "name": "copyResultToAzureBlobStorage",
                 "type": "boolean",
