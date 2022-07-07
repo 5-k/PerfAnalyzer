@@ -50,7 +50,7 @@ var JMETER_FILE_NAME = 'apache-jmeter.tgz';
 var JMETER_BIN_Folder_NAME = 'bin';
 var armStorage = require('azure-pipelines-tasks-azure-arm-rest-v2/azure-arm-storage');
 var azure_arm_endpoint_1 = require("azure-pipelines-tasks-azure-arm-rest-v2/azure-arm-endpoint");
-var _a = require("@azure/storage-blob"), BlobServiceClient = _a.BlobServiceClient, StorageSharedKeyCredential = _a.StorageSharedKeyCredential, BlockBlobParallelUploadOptions = _a.BlockBlobParallelUploadOptions, BlobHTTPHeaders = _a.BlobHTTPHeaders;
+var storage_blob_1 = require("@azure/storage-blob");
 var DATE_FORMAT = 'DD-MMM-YYYY HH:mm:ss:SSS ZZ';
 var DEFAULT_JMETER_REPORT_DIR_NAME = "CurrentReport";
 var DEFAULT_JMETER_LOG_DIR_NAME = "CurrentLog";
@@ -122,71 +122,30 @@ function unzipJMeterBinary() {
     });
 }
 function copyFileToDirectory(sourcefilePath, destinationFilePath) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    logInformation('Start Copying File to destination ' + destinationFilePath + ' from source ' + sourcefilePath);
-                    return [4 /*yield*/, fs.copyFile(sourcefilePath, destinationFilePath, function (err) {
-                            if (err)
-                                throw err;
-                            logInformation('Completed ' + sourcefilePath + ' was copied to ' + destinationFilePath);
-                        })];
-                case 1:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
-        });
+    logInformation('Start Copying File to destination ' + destinationFilePath + ' from source ' + sourcefilePath);
+    fs.copyFileSync(sourcefilePath, destinationFilePath, function (err) {
+        if (err)
+            throw err;
+        logInformation('Completed ' + sourcefilePath + ' was copied to ' + destinationFilePath);
     });
 }
-function copyDir(src, dest) {
-    return __awaiter(this, void 0, void 0, function () {
-        var fileNames;
-        var _this = this;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    fileNames = [];
-                    return [4 /*yield*/, fs.readdir(src, { withFileTypes: true }, function (err, files) { return __awaiter(_this, void 0, void 0, function () {
-                            var _i, files_1, entry, srcPath, destPath, fileName;
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0:
-                                        if (!err) return [3 /*break*/, 1];
-                                        logInformation(err);
-                                        return [3 /*break*/, 7];
-                                    case 1:
-                                        _i = 0, files_1 = files;
-                                        _a.label = 2;
-                                    case 2:
-                                        if (!(_i < files_1.length)) return [3 /*break*/, 7];
-                                        entry = files_1[_i];
-                                        srcPath = Path.join(src, entry.name);
-                                        destPath = Path.join(dest, entry.name);
-                                        if (!entry.isDirectory()) return [3 /*break*/, 4];
-                                        return [4 /*yield*/, copyDir(srcPath, dest)];
-                                    case 3:
-                                        _a.sent();
-                                        return [3 /*break*/, 6];
-                                    case 4: return [4 /*yield*/, copyFileToDirectory(srcPath, destPath)];
-                                    case 5:
-                                        _a.sent();
-                                        fileName = Path.parse(destPath).base;
-                                        fileNames.push(fileName);
-                                        _a.label = 6;
-                                    case 6:
-                                        _i++;
-                                        return [3 /*break*/, 2];
-                                    case 7: return [2 /*return*/];
-                                }
-                            });
-                        }); })];
-                case 1:
-                    _a.sent();
-                    return [2 /*return*/, fileNames];
-            }
-        });
+function copyDirectoryRecursiveSync(source, target, move) {
+    if (!fs.lstatSync(source).isDirectory())
+        return [];
+    var files = [];
+    var operation = move ? fs.renameSync : fs.copyFileSync;
+    fs.readdirSync(source).forEach(function (itemName) {
+        var sourcePath = Path.join(source, itemName);
+        var targetPath = Path.join(target, itemName);
+        if (fs.lstatSync(sourcePath).isDirectory()) {
+            copyDirectoryRecursiveSync(sourcePath, target, false);
+        }
+        else {
+            operation(sourcePath, targetPath);
+            files.push(sourcePath);
+        }
     });
+    return files;
 }
 function handleJMeterJMXFile(JMETER_BIN_Folder) {
     return __awaiter(this, void 0, void 0, function () {
@@ -277,16 +236,15 @@ function handleJMeterInputFile(JMETER_BIN_Folder) {
                     logInformation('Not downloading files');
                     return [2 /*return*/, null];
                 case 1:
-                    if (!(jmxInputFilesSource == InputVariableType.SourceCode)) return [3 /*break*/, 3];
+                    if (!(jmxInputFilesSource == InputVariableType.SourceCode)) return [3 /*break*/, 2];
                     jmxInputFolderSourcePath = tl.getInput(InputVariables.JMX_INPUT_FOLDER_SOURCE_PATH, true);
                     if (!jmxInputFolderSourcePath || jmxInputFolderSourcePath.length == 0) {
                         tl.setResult(tl.TaskResult.Failed, "Unable to find and download JMX Input File From Source");
                         return [2 /*return*/, null];
                     }
                     logInformation('Downloading Input File(s) from source ' + jmxInputFolderSourcePath + ' to destination' + JMETER_BIN_Folder);
-                    return [4 /*yield*/, copyDir(jmxInputFolderSourcePath, JMETER_BIN_Folder)];
-                case 2: return [2 /*return*/, _a.sent()];
-                case 3:
+                    return [2 /*return*/, copyDirectoryRecursiveSync(jmxInputFolderSourcePath, JMETER_BIN_Folder, false)];
+                case 2:
                     jmxInputFolderSourceUrls = tl.getDelimitedInput(InputVariables.JMX_INPUT_FILES_URL, ',', true);
                     if (isEmpty(jmxInputFolderSourceUrls)) {
                         tl.setResult(tl.TaskResult.Failed, "Missing User Input External URLs");
@@ -295,41 +253,47 @@ function handleJMeterInputFile(JMETER_BIN_Folder) {
                     fileNames = [];
                     count = 0;
                     _i = 0, jmxInputFolderSourceUrls_1 = jmxInputFolderSourceUrls;
-                    _a.label = 4;
-                case 4:
-                    if (!(_i < jmxInputFolderSourceUrls_1.length)) return [3 /*break*/, 9];
+                    _a.label = 3;
+                case 3:
+                    if (!(_i < jmxInputFolderSourceUrls_1.length)) return [3 /*break*/, 8];
                     file = jmxInputFolderSourceUrls_1[_i];
                     if (isEmpty(file)) {
                         logInformation('Skipping File');
-                        return [3 /*break*/, 8];
+                        return [3 /*break*/, 7];
                     }
                     count++;
                     file = file.trim();
                     fileName = Path.parse(file).base;
                     logInformation('Downloading (' + count + '/' + jmxInputFolderSourceUrls.length + '). File from source ' + file + ' to destination' + fileName + ' to preloaded location: ' + JMETER_BIN_Folder);
-                    _a.label = 5;
-                case 5:
-                    _a.trys.push([5, 7, , 8]);
+                    _a.label = 4;
+                case 4:
+                    _a.trys.push([4, 6, , 7]);
                     return [4 /*yield*/, downloadFile(file, fileName)];
-                case 6:
+                case 5:
                     _a.sent();
                     fileNames.push(fileName);
-                    return [3 /*break*/, 8];
-                case 7:
+                    return [3 /*break*/, 7];
+                case 6:
                     e_1 = _a.sent();
                     logInformation('Could not download File: ' + file);
-                    return [3 /*break*/, 8];
-                case 8:
+                    return [3 /*break*/, 7];
+                case 7:
                     _i++;
-                    return [3 /*break*/, 4];
-                case 9: return [2 /*return*/, fileNames];
+                    return [3 /*break*/, 3];
+                case 8: return [2 /*return*/, fileNames];
             }
         });
     });
 }
+function promiseFromChildProcess(child) {
+    return new Promise(function (resolve, reject) {
+        child.addListener("error", reject);
+        child.addListener("exit", resolve);
+    });
+}
 function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var JMETER_URL, JMETER_FILE_Folder, JMETER_BIN_Folder, JMETER_ABS_BIN_Folder, jmeterJMXFileName, jmxPropertySource, jmxInputFilesSource, jmeterPropertyFileName, jmeterInputFileNames, jmeterLogFolder, jmeterReportFolder, command, CurrentLogJTLFile, CurrentLogLogFile, exec2, promise2, promise, child, child2, _a, stdout, stderr, copyToBlob, err_1;
+        var JMETER_URL, JMETER_FILE_Folder, JMETER_BIN_Folder, JMETER_ABS_BIN_Folder, jmeterJMXFileName, jmxPropertySource, jmxInputFilesSource, jmeterPropertyFileName, jmeterInputFileNames, jmeterLogFolder_1, jmeterReportFolder_1, command, CurrentLogJTLFile, CurrentLogLogFile, child, _a, stdout, stderr, err_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -393,21 +357,21 @@ function main() {
                     logInformation('Completed Handle Input Files. FileCount: ' + ((null != jmeterInputFileNames) ? jmeterInputFileNames === null || jmeterInputFileNames === void 0 ? void 0 : jmeterInputFileNames.length : 0));
                     _b.label = 10;
                 case 10:
-                    jmeterLogFolder = tl.getInput(InputVariables.JMETER_LOG_FOLDER, true);
-                    jmeterReportFolder = tl.getInput(InputVariables.JMETER_REPORT_FOLDER, true);
-                    if (isEmpty(jmeterLogFolder)) {
-                        jmeterLogFolder = DEFAULT_JMETER_LOG_DIR_NAME;
+                    jmeterLogFolder_1 = tl.getInput(InputVariables.JMETER_LOG_FOLDER, true);
+                    jmeterReportFolder_1 = tl.getInput(InputVariables.JMETER_REPORT_FOLDER, true);
+                    if (isEmpty(jmeterLogFolder_1)) {
+                        jmeterLogFolder_1 = DEFAULT_JMETER_LOG_DIR_NAME;
                         logInformation('Missing JMeter Log Folder Name. Using ' + DEFAULT_JMETER_LOG_DIR_NAME + ' as default name.');
                     }
-                    if (isEmpty(jmeterReportFolder)) {
-                        jmeterReportFolder = DEFAULT_JMETER_REPORT_DIR_NAME;
+                    if (isEmpty(jmeterReportFolder_1)) {
+                        jmeterReportFolder_1 = DEFAULT_JMETER_REPORT_DIR_NAME;
                         logInformation('Missing JMeter Report Folder Name. Using ' + DEFAULT_JMETER_REPORT_DIR_NAME + ' as default name.');
                     }
                     command = '';
-                    CurrentLogJTLFile = Path.join(jmeterLogFolder, LOG_JTL_FILE_NAME);
-                    CurrentLogLogFile = Path.join(jmeterLogFolder, JMETER_LOG_FILE_NAME);
+                    CurrentLogJTLFile = Path.join(jmeterLogFolder_1, LOG_JTL_FILE_NAME);
+                    CurrentLogLogFile = Path.join(jmeterLogFolder_1, JMETER_LOG_FILE_NAME);
                     if (!(jmxPropertySource == 'none')) return [3 /*break*/, 11];
-                    command = 'jmeter -n -t ' + jmeterJMXFileName + '  -l ' + CurrentLogJTLFile + ' -j ' + CurrentLogLogFile + ' -f -e -o ' + jmeterReportFolder;
+                    command = 'jmeter -n -t ' + jmeterJMXFileName + '  -l ' + CurrentLogJTLFile + ' -j ' + CurrentLogLogFile + ' -f -e -o ' + jmeterReportFolder_1;
                     logInformation('Running JMeter Without Property File: ' + command);
                     return [3 /*break*/, 13];
                 case 11:
@@ -416,43 +380,34 @@ function main() {
                 case 12:
                     _b.sent();
                     logInformation('Completed Replace Tokens');
-                    command = 'jmeter -q ' + jmeterPropertyFileName + ' -n -t ' + jmeterJMXFileName + '  -l ' + CurrentLogJTLFile + ' -j ' + CurrentLogLogFile + ' -f -e -o ' + jmeterReportFolder;
+                    command = '.\\jmeter -q ' + jmeterPropertyFileName + ' -n -t ' + jmeterJMXFileName + '  -l ' + CurrentLogJTLFile + ' -j ' + CurrentLogLogFile + ' -f -e -o ' + jmeterReportFolder_1;
                     logInformation('Running JMeter with property file ' + command);
                     _b.label = 13;
                 case 13:
-                    exec2 = util.promisify(require('child_process').exec);
-                    promise2 = exec2(command);
-                    promise = exec(command);
-                    tl.warning('promise');
-                    tl.warning(promise);
-                    tl.warning('promise2');
-                    tl.warning(promise2);
-                    child = promise.child;
-                    child2 = promise.child2;
-                    tl.warning('child');
-                    tl.warning(child);
-                    tl.warning('child2');
-                    tl.warning(child2);
-                    if (null != child) {
-                        child.stdout.on('data', function (data) {
-                            logInformation(' stdout: ' + data);
-                        });
-                        child.stderr.on('data', function (data) {
-                            logInformation(' stderr: ' + data);
-                        });
-                        child.on('close', function (code) {
-                            logInformation(' closing code: ' + code);
-                        });
-                    }
-                    return [4 /*yield*/, promise2];
+                    child = exec(command);
+                    promiseFromChildProcess(child).then(function (result) {
+                        logInformation('promise complete: ' + result);
+                        var copyToBlob = tl.getBoolInput(InputVariables.COPY_RESULT_TO_AZURE_BLOB_STORAGE, true);
+                        if (copyToBlob) {
+                            logInformation('Copying Test Results to Azure blob storage.');
+                            copyResultsToAzureBlob(jmeterReportFolder_1, jmeterLogFolder_1);
+                        }
+                        logInformation('Task Completed.');
+                    }, function (err) {
+                        logInformation('promise rejected: ' + err);
+                    });
+                    child.stdout.on('data', function (data) {
+                        logInformation('stdout: ' + data, false);
+                    });
+                    child.stderr.on('data', function (data) {
+                        logInformation('stderr: ' + data, false);
+                    });
+                    child.on('close', function (code) {
+                        logInformation('closing code: ' + code);
+                    });
+                    return [4 /*yield*/, child];
                 case 14:
                     _a = _b.sent(), stdout = _a.stdout, stderr = _a.stderr;
-                    copyToBlob = tl.getBoolInput(InputVariables.COPY_RESULT_TO_AZURE_BLOB_STORAGE, true);
-                    if (copyToBlob) {
-                        logInformation('Copying Test Results to Azure blob storage.');
-                        copyResultsToAzureBlob(jmeterReportFolder, jmeterLogFolder);
-                    }
-                    logInformation('Task Completed.');
                     return [3 /*break*/, 16];
                 case 15:
                     err_1 = _b.sent();
@@ -566,8 +521,8 @@ function copyResultsToAzureBlob(reportFolderName, logFolderName) {
                     accessKeys = _b.sent();
                     accessKey = accessKeys[0];
                     storageAccountURI = AZURE_STORAGE_ACCOUNT_URI.replace(AZURE_STORAGE_ACCOUNT_NAME_PLACEHOLDER, storageAccountName);
-                    cert = new StorageSharedKeyCredential(storageAccountName, accessKey);
-                    blobServiceClient = new BlobServiceClient(storageAccountURI, cert);
+                    cert = new storage_blob_1.StorageSharedKeyCredential(storageAccountName, accessKey);
+                    blobServiceClient = new storage_blob_1.BlobServiceClient(storageAccountURI, cert);
                     destContainerName = tl.getInput(InputVariables.CONTAINER_NAME);
                     if (!destContainerName || destContainerName.length == 0) {
                         logInformation('Missing required variable: ' + InputVariables.CONTAINER_NAME);
@@ -614,7 +569,7 @@ function uploadBlob(src, uploadFolderName, blobPrefix, destContainerClient) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, fs.readdir(src, { withFileTypes: true }, function (err, files) { return __awaiter(_this, void 0, void 0, function () {
-                        var _i, files_2, entry, srcPath, uploadFileName, path, blockBlobClient;
+                        var _i, files_1, entry, srcPath, uploadFileName, path, blockBlobClient;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
@@ -622,11 +577,11 @@ function uploadBlob(src, uploadFolderName, blobPrefix, destContainerClient) {
                                     logInformation(err);
                                     return [3 /*break*/, 7];
                                 case 1:
-                                    _i = 0, files_2 = files;
+                                    _i = 0, files_1 = files;
                                     _a.label = 2;
                                 case 2:
-                                    if (!(_i < files_2.length)) return [3 /*break*/, 7];
-                                    entry = files_2[_i];
+                                    if (!(_i < files_1.length)) return [3 /*break*/, 7];
+                                    entry = files_1[_i];
                                     srcPath = Path.join(src, entry.name);
                                     uploadFileName = srcPath.substring(srcPath.indexOf(uploadFolderName));
                                     if (!entry.isDirectory()) return [3 /*break*/, 4];
@@ -718,9 +673,16 @@ function isEmpty(str) {
 function isNonEmpty(str) {
     return !isEmpty(str);
 }
-function logInformation(data) {
-    var formattedDate = (moment(Date.now())).format(DATE_FORMAT);
-    console.log(formattedDate + ":  " + data);
-    tl.debug(formattedDate + ":  " + data);
+function logInformation(data, printDate) {
+    if (printDate === void 0) { printDate = true; }
+    if (printDate) {
+        var formattedDate = (moment(Date.now())).format(DATE_FORMAT);
+        console.log(formattedDate + ":  " + data);
+        tl.debug(formattedDate + ":  " + data);
+    }
+    else {
+        console.log(data);
+        tl.debug(data);
+    }
 }
 main();

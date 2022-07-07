@@ -1,4 +1,4 @@
-
+import sh from 'shelljs'; 
 const tl = require('azure-pipelines-task-lib/task'); 
 const https = require('https');
 const fs = require('fs');
@@ -14,7 +14,7 @@ const JMETER_BIN_Folder_NAME= 'bin'
 const armStorage = require('azure-pipelines-tasks-azure-arm-rest-v2/azure-arm-storage');  
 import { AzureRMEndpoint } from 'azure-pipelines-tasks-azure-arm-rest-v2/azure-arm-endpoint';
 import { AzureEndpoint, StorageAccount } from 'azure-pipelines-tasks-azure-arm-rest-v2/azureModels';
-const { BlobServiceClient, StorageSharedKeyCredential,BlockBlobParallelUploadOptions ,BlobHTTPHeaders, } = require("@azure/storage-blob");
+import { BlobServiceClient, StorageSharedKeyCredential, BlockBlobParallelUploadOptions, BlobHTTPHeaders } from "@azure/storage-blob";
 const DATE_FORMAT = 'DD-MMM-YYYY HH:mm:ss:SSS ZZ';
 
 const DEFAULT_JMETER_REPORT_DIR_NAME = "CurrentReport";
@@ -76,37 +76,34 @@ async function unzipJMeterBinary() {
     await tar.x({file: JMETER_FILE_NAME});
 }
 
-async function copyFileToDirectory(sourcefilePath: string, destinationFilePath: string) {   
+function copyFileToDirectory(sourcefilePath: string, destinationFilePath: string) {   
     logInformation('Start Copying File to destination ' + destinationFilePath + ' from source ' + sourcefilePath)
-    await fs.copyFile(sourcefilePath, destinationFilePath, (err: any) => {
+    fs.copyFileSync(sourcefilePath, destinationFilePath, (err: any) => {
         if (err) throw err;
         logInformation('Completed '+ sourcefilePath + ' was copied to ' + destinationFilePath);
       });   
 }
 
-async function copyDir(src: string, dest: string):Promise<string[]> {
-    let fileNames:string[] = [];
+function copyDirectoryRecursiveSync(source, target, move): string[] {
+    if (!fs.lstatSync(source).isDirectory())
+        return [];
+    let files: string[] = []
+    var operation = move ? fs.renameSync : fs.copyFileSync;
+    fs.readdirSync(source).forEach(function (itemName) {
+        var sourcePath = Path.join(source, itemName);
+        var targetPath = Path.join(target, itemName);
 
-    await fs.readdir(src, {withFileTypes: true}, async (err, files) => {
-        if (err) {
-            logInformation(err);
-        } else {
-            for(let entry of files) {
-                const srcPath = Path.join(src, entry.name);
-                const destPath = Path.join(dest, entry.name);
-                if(entry.isDirectory()) {
-                    await copyDir(srcPath, dest);
-                } else {
-                    await  copyFileToDirectory(srcPath, destPath);
-                    let fileName=Path.parse(destPath).base;
-                    fileNames.push(fileName);
-                }
-            }
+        if (fs.lstatSync(sourcePath).isDirectory()) {
+            copyDirectoryRecursiveSync(sourcePath, target, false);
         }
-          
+        else {
+            operation(sourcePath, targetPath);
+            files.push(sourcePath);
+        }
     });
-    return fileNames;
-} 
+    return files;
+}
+
 
 async function handleJMeterJMXFile(JMETER_BIN_Folder: string): Promise<string|undefined|null>{
     
@@ -167,7 +164,7 @@ async function handleJMeterPropertyFile(JMETER_BIN_Folder: string): Promise<stri
     }
 }   
 
-async function  handleJMeterInputFile(JMETER_BIN_Folder: string): Promise<string[]|null>{
+async function handleJMeterInputFile(JMETER_BIN_Folder: string): Promise<string[]|null>{
     let jmxInputFilesSource = tl.getInput(InputVariables.JMX_INPUT_FILE_SOURCE,true);
     
     if(jmxInputFilesSource==InputVariableType.None) {
@@ -180,7 +177,7 @@ async function  handleJMeterInputFile(JMETER_BIN_Folder: string): Promise<string
            return null;
        }
         logInformation('Downloading Input File(s) from source ' + jmxInputFolderSourcePath +  ' to destination' + JMETER_BIN_Folder);        
-        return await copyDir(jmxInputFolderSourcePath, JMETER_BIN_Folder);             
+        return copyDirectoryRecursiveSync(jmxInputFolderSourcePath, JMETER_BIN_Folder, false);             
     } else {
         let jmxInputFolderSourceUrls= tl.getDelimitedInput(InputVariables.JMX_INPUT_FILES_URL,',',true);
         if(isEmpty(jmxInputFolderSourceUrls)) {
@@ -210,6 +207,14 @@ async function  handleJMeterInputFile(JMETER_BIN_Folder: string): Promise<string
         return fileNames;
     }
 }
+
+function promiseFromChildProcess(child) {
+    return new Promise(function (resolve, reject) {
+        child.addListener("error", reject);
+        child.addListener("exit", resolve);
+    });
+}
+
 async function main() {
     try {
         let JMETER_URL = tl.getInput(InputVariables.JMX_BINARY_URI,true);
@@ -292,51 +297,35 @@ async function main() {
             await replaceTokens(jmeterPropertyFileName)
             logInformation('Completed Replace Tokens');
 
-            command = 'jmeter -q ' + jmeterPropertyFileName + ' -n -t ' + jmeterJMXFileName + '  -l ' + CurrentLogJTLFile + ' -j '+ CurrentLogLogFile + ' -f -e -o ' + jmeterReportFolder;
+            command = '.\\jmeter -q ' + jmeterPropertyFileName + ' -n -t ' + jmeterJMXFileName + '  -l ' + CurrentLogJTLFile + ' -j '+ CurrentLogLogFile + ' -f -e -o ' + jmeterReportFolder;
             logInformation('Running JMeter with property file ' + command); 
         }
-        const exec2 = util.promisify(require('child_process').exec);
-        const promise2 = exec2(command);
-        
-        const promise = exec(command);
-        
 
-        tl.warning('promise');
-        tl.warning(promise);
+        var child = exec(command);
+        promiseFromChildProcess(child).then(function (result) {
+            logInformation('promise complete: ' + result);
+            let copyToBlob = tl.getBoolInput(InputVariables.COPY_RESULT_TO_AZURE_BLOB_STORAGE, true);
+            if(copyToBlob) {
+                logInformation('Copying Test Results to Azure blob storage.')
+                copyResultsToAzureBlob(jmeterReportFolder, jmeterLogFolder);
+            }
+            
+            logInformation('Task Completed.')
+        }, function (err) {
+            logInformation('promise rejected: ' + err);
+        });
         
-        tl.warning('promise2');
-        tl.warning(promise2);
- 
-        const child = promise.child;   
-        const child2 = promise.child2;  
-
-        
-        tl.warning('child');
-        tl.warning(child);
-        
-        tl.warning('child2');
-        tl.warning(child2);
-
-        if (null != child) {
-            child.stdout.on('data', function(data) {
-                logInformation(' stdout: ' + data);
-            });
-            child.stderr.on('data', function(data) {
-                logInformation(' stderr: ' + data);
-            });
-            child.on('close', function(code) {
-                logInformation(' closing code: ' + code);
-            });
-        }
-        
-        const { stdout, stderr } = await promise2;
-        let copyToBlob = tl.getBoolInput(InputVariables.COPY_RESULT_TO_AZURE_BLOB_STORAGE, true);
-        if(copyToBlob) {
-            logInformation('Copying Test Results to Azure blob storage.')
-            copyResultsToAzureBlob(jmeterReportFolder, jmeterLogFolder);
-        }
-        
-        logInformation('Task Completed.')
+        child.stdout.on('data', function (data) {
+            logInformation('stdout: ' + data, false);
+        });
+        child.stderr.on('data', function (data) {
+            logInformation('stderr: ' + data, false);
+        });
+        child.on('close', function (code) {
+            logInformation('closing code: ' + code);
+        });
+        const { stdout, stderr } = await child;
+      
     } catch (err: any) {
         logInformation(err);
         tl.setResult(tl.TaskResult.Failed, err?.message);
@@ -566,10 +555,16 @@ function isNonEmpty(str: string|undefined|null): boolean {
     return !isEmpty(str);
 }
 
-function logInformation(data: any) {
-    let formattedDate = (moment(Date.now())).format(DATE_FORMAT)
-    console.log(formattedDate + ":  " + data);
-    tl.debug(formattedDate + ":  " + data)
+function logInformation(data: any, printDate: boolean = true) {
+    if(printDate) {
+        let formattedDate = (moment(Date.now())).format(DATE_FORMAT)
+        console.log(formattedDate + ":  " + data);
+        tl.debug(formattedDate + ":  " + data)
+    } else {
+        console.log(data);
+        tl.debug(data)
+    }
+    
 }
  
 main();

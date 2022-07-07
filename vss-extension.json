@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "f777aedf-a7f3-4700-8b55-ffe426cc252a",
     "name": "Performance Analyzer",
-    "version": "0.1.17",
+    "version": "0.1.26",
     "publisher": "MishraPrateek123",
     "targets": [
         {
