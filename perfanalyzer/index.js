@@ -45,11 +45,13 @@ var Path = require('path');
 var sh = require('shelljs');
 var util = require('util');
 var exec = require('child_process').exec;
+var moment = require("moment");
 var JMETER_FILE_NAME = 'apache-jmeter.tgz';
 var JMETER_BIN_Folder_NAME = 'bin';
 var armStorage = require('azure-pipelines-tasks-azure-arm-rest-v2/azure-arm-storage');
 var azure_arm_endpoint_1 = require("azure-pipelines-tasks-azure-arm-rest-v2/azure-arm-endpoint");
 var _a = require("@azure/storage-blob"), BlobServiceClient = _a.BlobServiceClient, StorageSharedKeyCredential = _a.StorageSharedKeyCredential, BlockBlobParallelUploadOptions = _a.BlockBlobParallelUploadOptions, BlobHTTPHeaders = _a.BlobHTTPHeaders;
+var DATE_FORMAT = 'DD-MMM-YYYY HH:mm:ss:SSS ZZ';
 var DEFAULT_JMETER_REPORT_DIR_NAME = "CurrentReport";
 var DEFAULT_JMETER_LOG_DIR_NAME = "CurrentLog";
 var AZURE_STORAGE_ACCOUNT_URI = 'https://${storageAccountName}.blob.core.windows.net';
@@ -124,11 +126,11 @@ function copyFileToDirectory(sourcefilePath, destinationFilePath) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    logInformation('Copying File to destination ' + destinationFilePath + ' from source ' + sourcefilePath);
+                    logInformation('Start Copying File to destination ' + destinationFilePath + ' from source ' + sourcefilePath);
                     return [4 /*yield*/, fs.copyFile(sourcefilePath, destinationFilePath, function (err) {
                             if (err)
                                 throw err;
-                            logInformation(sourcefilePath + ' was copied to ' + destinationFilePath);
+                            logInformation('Completed ' + sourcefilePath + ' was copied to ' + destinationFilePath);
                         })];
                 case 1:
                     _a.sent();
@@ -162,11 +164,11 @@ function copyDir(src, dest) {
                                         srcPath = Path.join(src, entry.name);
                                         destPath = Path.join(dest, entry.name);
                                         if (!entry.isDirectory()) return [3 /*break*/, 4];
-                                        return [4 /*yield*/, copyDir(srcPath, destPath)];
+                                        return [4 /*yield*/, copyDir(srcPath, dest)];
                                     case 3:
                                         _a.sent();
                                         return [3 /*break*/, 6];
-                                    case 4: return [4 /*yield*/, fs.copyFile(srcPath, destPath)];
+                                    case 4: return [4 /*yield*/, copyFileToDirectory(srcPath, destPath)];
                                     case 5:
                                         _a.sent();
                                         fileName = Path.parse(destPath).base;
@@ -327,7 +329,7 @@ function handleJMeterInputFile(JMETER_BIN_Folder) {
 }
 function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var JMETER_URL, JMETER_FILE_Folder, JMETER_BIN_Folder, JMETER_ABS_BIN_Folder, jmeterJMXFileName, jmxPropertySource, jmxInputFilesSource, jmeterPropertyFileName, jmeterInputFileNames, jmeterLogFolder, jmeterReportFolder, command, CurrentLogJTLFile, CurrentLogLogFile, exec2, promise2, _a, stdout, stderr, copyToBlob, err_1;
+        var JMETER_URL, JMETER_FILE_Folder, JMETER_BIN_Folder, JMETER_ABS_BIN_Folder, jmeterJMXFileName, jmxPropertySource, jmxInputFilesSource, jmeterPropertyFileName, jmeterInputFileNames, jmeterLogFolder, jmeterReportFolder, command, CurrentLogJTLFile, CurrentLogLogFile, exec2, promise2, promise, child, child2, _a, stdout, stderr, copyToBlob, err_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -389,11 +391,6 @@ function main() {
                 case 9:
                     jmeterInputFileNames = _b.sent();
                     logInformation('Completed Handle Input Files. FileCount: ' + ((null != jmeterInputFileNames) ? jmeterInputFileNames === null || jmeterInputFileNames === void 0 ? void 0 : jmeterInputFileNames.length : 0));
-                    if (!jmeterInputFileNames || (jmeterInputFileNames === null || jmeterInputFileNames === void 0 ? void 0 : jmeterInputFileNames.length) == 0) {
-                        logInformation('No Input Files Found to Use In Pipeline');
-                        tl.setResult(tl.TaskResult.Failed, 'No Input Files Found to Use In Pipeline');
-                        return [2 /*return*/];
-                    }
                     _b.label = 10;
                 case 10:
                     jmeterLogFolder = tl.getInput(InputVariables.JMETER_LOG_FOLDER, true);
@@ -425,6 +422,28 @@ function main() {
                 case 13:
                     exec2 = util.promisify(require('child_process').exec);
                     promise2 = exec2(command);
+                    promise = exec(command);
+                    tl.warning('promise');
+                    tl.warning(promise);
+                    tl.warning('promise2');
+                    tl.warning(promise2);
+                    child = promise.child;
+                    child2 = promise.child2;
+                    tl.warning('child');
+                    tl.warning(child);
+                    tl.warning('child2');
+                    tl.warning(child2);
+                    if (null != child) {
+                        child.stdout.on('data', function (data) {
+                            logInformation(' stdout: ' + data);
+                        });
+                        child.stderr.on('data', function (data) {
+                            logInformation(' stderr: ' + data);
+                        });
+                        child.on('close', function (code) {
+                            logInformation(' closing code: ' + code);
+                        });
+                    }
                     return [4 /*yield*/, promise2];
                 case 14:
                     _a = _b.sent(), stdout = _a.stdout, stderr = _a.stderr;
@@ -700,8 +719,8 @@ function isNonEmpty(str) {
     return !isEmpty(str);
 }
 function logInformation(data) {
-    var currentTimeInMilliseconds = Date.now().toLocaleString();
-    console.log(currentTimeInMilliseconds + ":" + data);
-    tl.debug(currentTimeInMilliseconds + ":" + data);
+    var formattedDate = (moment(Date.now())).format(DATE_FORMAT);
+    console.log(formattedDate + ":  " + data);
+    tl.debug(formattedDate + ":  " + data);
 }
 main();

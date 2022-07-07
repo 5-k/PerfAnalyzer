@@ -7,6 +7,7 @@ const Path = require('path');
 const sh = require('shelljs'); 
 const util = require('util');
 var exec = require('child_process').exec;
+import * as moment from 'moment';
 
 const JMETER_FILE_NAME='apache-jmeter.tgz'
 const JMETER_BIN_Folder_NAME= 'bin'  
@@ -14,6 +15,7 @@ const armStorage = require('azure-pipelines-tasks-azure-arm-rest-v2/azure-arm-st
 import { AzureRMEndpoint } from 'azure-pipelines-tasks-azure-arm-rest-v2/azure-arm-endpoint';
 import { AzureEndpoint, StorageAccount } from 'azure-pipelines-tasks-azure-arm-rest-v2/azureModels';
 const { BlobServiceClient, StorageSharedKeyCredential,BlockBlobParallelUploadOptions ,BlobHTTPHeaders, } = require("@azure/storage-blob");
+const DATE_FORMAT = 'DD-MMM-YYYY HH:mm:ss:SSS ZZ';
 
 const DEFAULT_JMETER_REPORT_DIR_NAME = "CurrentReport";
 const DEFAULT_JMETER_LOG_DIR_NAME = "CurrentLog";
@@ -75,13 +77,12 @@ async function unzipJMeterBinary() {
 }
 
 async function copyFileToDirectory(sourcefilePath: string, destinationFilePath: string) {   
-    logInformation('Copying File to destination ' + destinationFilePath + ' from source ' + sourcefilePath)
+    logInformation('Start Copying File to destination ' + destinationFilePath + ' from source ' + sourcefilePath)
     await fs.copyFile(sourcefilePath, destinationFilePath, (err: any) => {
         if (err) throw err;
-        logInformation(sourcefilePath + ' was copied to ' + destinationFilePath);
+        logInformation('Completed '+ sourcefilePath + ' was copied to ' + destinationFilePath);
       });   
 }
-
 
 async function copyDir(src: string, dest: string):Promise<string[]> {
     let fileNames:string[] = [];
@@ -94,17 +95,16 @@ async function copyDir(src: string, dest: string):Promise<string[]> {
                 const srcPath = Path.join(src, entry.name);
                 const destPath = Path.join(dest, entry.name);
                 if(entry.isDirectory()) {
-                    await copyDir(srcPath, destPath);
+                    await copyDir(srcPath, dest);
                 } else {
-                    await fs.copyFile(srcPath, destPath);
+                    await  copyFileToDirectory(srcPath, destPath);
                     let fileName=Path.parse(destPath).base;
                     fileNames.push(fileName);
                 }
             }
         }
           
-    }); 
-
+    });
     return fileNames;
 } 
 
@@ -264,11 +264,6 @@ async function main() {
             let jmeterInputFileNames:string[]|null = await handleJMeterInputFile(JMETER_ABS_BIN_Folder);
             logInformation('Completed Handle Input Files. FileCount: ' + ((null != jmeterInputFileNames) ? jmeterInputFileNames?.length : 0));
             
-            if(!jmeterInputFileNames || jmeterInputFileNames?.length ==0) {
-                logInformation('No Input Files Found to Use In Pipeline');
-                tl.setResult(tl.TaskResult.Failed, 'No Input Files Found to Use In Pipeline');
-                return;
-            }
         }
 
 
@@ -302,36 +297,38 @@ async function main() {
         }
         const exec2 = util.promisify(require('child_process').exec);
         const promise2 = exec2(command);
-        /*
+        
         const promise = exec(command);
         
 
-        logInformation('promise');
-        logInformation(promise);
+        tl.warning('promise');
+        tl.warning(promise);
         
-        logInformation('promise2');
-        logInformation(promise2);
+        tl.warning('promise2');
+        tl.warning(promise2);
  
         const child = promise.child;   
         const child2 = promise.child2;  
 
         
-        logInformation('child');
-        logInformation(child);
+        tl.warning('child');
+        tl.warning(child);
         
-        logInformation('child2');
-        logInformation(child2);
+        tl.warning('child2');
+        tl.warning(child2);
 
-        child.stdout.on('data', function(data) {
-            logInformation(' stdout: ' + data);
-        });
-        child.stderr.on('data', function(data) {
-            logInformation(' stderr: ' + data);
-        });
-        child.on('close', function(code) {
-            logInformation(' closing code: ' + code);
-        });
-        */
+        if (null != child) {
+            child.stdout.on('data', function(data) {
+                logInformation(' stdout: ' + data);
+            });
+            child.stderr.on('data', function(data) {
+                logInformation(' stderr: ' + data);
+            });
+            child.on('close', function(code) {
+                logInformation(' closing code: ' + code);
+            });
+        }
+        
         const { stdout, stderr } = await promise2;
         let copyToBlob = tl.getBoolInput(InputVariables.COPY_RESULT_TO_AZURE_BLOB_STORAGE, true);
         if(copyToBlob) {
@@ -570,9 +567,9 @@ function isNonEmpty(str: string|undefined|null): boolean {
 }
 
 function logInformation(data: any) {
-    let currentTimeInMilliseconds=Date.now().toLocaleString();
-    console.log(currentTimeInMilliseconds + ":" + data);
-    tl.debug(currentTimeInMilliseconds + ":" + data)
+    let formattedDate = (moment(Date.now())).format(DATE_FORMAT)
+    console.log(formattedDate + ":  " + data);
+    tl.debug(formattedDate + ":  " + data)
 }
  
 main();
