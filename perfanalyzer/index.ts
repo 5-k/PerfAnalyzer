@@ -501,6 +501,9 @@ async function copyResultsToAzureBlob(reportFolderName: string, logFolderName: s
         logInformation(' Performance Test Result Available at: ' + REPORT_URL);
         logInformation(' JMeter JTL File Available at: ' + JTL_URL);
         logInformation(' JMeter Log File Available at: ' + LOG_URL);
+        tl.warning(' Performance Test Result Available at: ' + REPORT_URL);
+        tl.warning(' JMeter JTL File Available at: ' + JTL_URL);
+        tl.warning(' JMeter Log File Available at: ' + LOG_URL);
     }
 }
 
