@@ -51,3 +51,23 @@ If this container exists, skip this step.
 `Container(anonymous read access for container and blobs)`
 
 ![Screenshot](screenshots/p8.png)
+
+
+## Sample Screenshots for Pipeline Variables for Source Code Inputs
+
+![Screenshot](screenshots/p9.png)
+
+![Screenshot](screenshots/p10.png)
+
+
+## Sample Screenshots for Pipeline Variables for External URL Inputs
+
+![Screenshot](screenshots/p11.png)
+
+## Sample Screenshots for Pipeline Variables where no property file is used.
+
+![Screenshot](screenshots/p12.png)
+
+## Sample Screenshots for Pipeline Variables where  Property file is used but no input files are required
+
+![Screenshot](screenshots/p13.png)
