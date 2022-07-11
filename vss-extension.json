@@ -2,8 +2,9 @@
     "manifestVersion": 1,
     "id": "f777aedf-a7f3-4700-8b55-ffe426cc252a",
     "name": "Performance Analyzer",
-    "version": "0.1.35",
+    "version": "1.0.36",
     "publisher": "MishraPrateek",
+    "public": true,
     "targets": [
         {
             "id": "Microsoft.VisualStudio.Services"
@@ -28,6 +29,9 @@
         },
         "issues": {
             "uri": "https://github.com/5-k/PerfAnalyzer/issues"
+        },
+        "linkedin": {
+            "uri": "https://www.linkedin.com/in/prateek-mishra-61aa4658/"
         }
     },
     "tags": [
