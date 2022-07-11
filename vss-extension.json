@@ -4,7 +4,7 @@
     "name": "Performance Analyzer",
     "version": "1.0.36",
     "publisher": "MishraPrateek",
-    "public": true,
+    "public": false,
     "targets": [
         {
             "id": "Microsoft.VisualStudio.Services"
@@ -18,7 +18,9 @@
         "default": "images/extension-icon.png"
     },
     "files": [
-        { "path": "perfanalyzer" }
+        { "path": "perfanalyzer" },
+         {"path": "README.md" },
+         {"path": "overview.md" }
     ],
     "links": {
         "home": {
