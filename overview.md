@@ -35,7 +35,7 @@ You need to enable static hosting in the storage container in order to be able t
 
 ## Sample Usage
 
-[![SAMPLE_USAGE](https://github.com/5-k/PerfAnalyzer/blob/main/samples/README.md)](https://github.com/5-k/PerfAnalyzer/blob/main/samples/README.md)
+![SAMPLE_USAGE](https://github.com/5-k/PerfAnalyzer/blob/main/samples/README.md)
 
 
 ## Screenshots
