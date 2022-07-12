@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "f777aedf-a7f3-4700-8b55-ffe426cc252a",
     "name": "JMeter Performance Analyzer",
-    "version": "1.0.40",
+    "version": "1.0.42",
     "publisher": "MishraPrateek123",
     "public": true,
     "targets": [
@@ -27,12 +27,12 @@
         {
             "path": "images/extension-icon.png",
             "addressable": true
-        }
+        },
+        {
+            "path": "screenshots",
+            "addressable": true
+          }
     ],
-    "branding": {
-        "color": "rgb(34, 34, 34)",
-        "theme": "dark"
-    },
     "screenshots": [
         { "path": "screenshots/P4.png"},
         { "path": "screenshots/P5.png"},
@@ -72,6 +72,10 @@
     "repository": {
         "type": "git",
         "uri": "https://github.com/5-k/PerfAnalyzer"
+    },
+    "branding": {
+        "color": "#FFFFFF",
+        "theme": "light"
     },
     "tags": [
         "performance", 

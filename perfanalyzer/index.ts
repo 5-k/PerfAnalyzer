@@ -6,6 +6,7 @@ const Path = require('path');
 const sh = require('shelljs'); 
 var exec = require('child_process').exec;
 import * as moment from 'moment'; 
+import {InputVariables, InputVariableType } from './src/constant'
 const JMETER_FILE_NAME='apache-jmeter.tgz'
 const JMETER_BIN_Folder_NAME= 'bin'  
 const armStorage = require('azure-pipelines-tasks-azure-arm-rest-v2/azure-arm-storage');  
@@ -23,37 +24,6 @@ const JMETER_LOG_FILE_NAME = 'jmeter.log';
 const JMETER_REPORT_INDEX_FILE_NAME = 'index.html';
 const URL_SEPERATOR = '/'; 
 
-enum InputVariables {
-    JMX_SOURCE = 'jmxSource',
-    JMX_SOURCE_RUN_FILE_SOURCE_PATH = 'jmxsourceRunFilePath',
-    JMX_SOURCE_RUN_FILE_URL ='jmxsourceRunFileURL',
-    JMX_PROPERTY_FILE_SOURCE = 'jmxPropertySource',
-    JMX_PROPERTY_FILE_SOURCE_PATH ='jmxPropertySourcePath',
-    JMX_PROPERTY_FILE_URL ='jmxPropertySourceURL',
-    JMX_INPUT_FILE_SOURCE = 'jmxInputFilesSource',
-    JMX_INPUT_FOLDER_SOURCE_PATH ='jmxInputFolderSourcePath',
-    JMX_INPUT_FILES_URL ='jmxInputFilesUrls',
-    JMX_BINARY_URI ='jmeterURI',
-    JMETER_FOLDER_NAME ='jmeterFolderName',
-    JMETER_LOG_FOLDER = 'jmeterLogFolder',
-    JMETER_REPORT_FOLDER = 'jmeterReportFolder',
-    COPY_RESULT_TO_AZURE_BLOB_STORAGE = 'copyResultToAzureBlobStorage',
-    PUBLISH_RESULTS_TO_BUILD_ARTIFACT = 'publishResultsToBuildArtifact',
-    TOKEN_REGEX = 'tokenRegex',
-    CONNECTED_SERVICE_ARM_NAME = 'ConnectedServiceNameARM',
-    STORAGE_ACCOUNT_RM = 'StorageAccountRM',
-    CONTAINER_NAME ='ContainerName',
-    BLOB_PREFIX = 'BlobPrefix',
-    OUTPUT_STORAGE_URI = 'outputStorageUri',
-    ARTIFACT_NAME_REPORT = 'artifactNameReport',
-    ARTIFACT_NAME_LOG = 'artifactNameLog'
-}
-enum InputVariableType {
-    SourceCode = 'sourceCode',
-    Url = 'url',
-    Urls = 'urls',
-    None = 'none'
-}
 async function downloadFile(fileSource: string, destinationFilePath: string) {
     logInformation('Downloading File: ' + fileSource + ' to location: ' + destinationFilePath );
     return new Promise<void>((resolve, reject) => {

@@ -10,7 +10,7 @@
     "version": {
         "Major": 1,
         "Minor": 0,
-        "Patch": 40
+        "Patch": 42
     },
     "instanceNameFormat": "Run Perf Analyzer",
     "groups": [
@@ -126,10 +126,10 @@
             {
                 "name": "publishResultsToBuildArtifact",
                 "type": "boolean",
-                "label": "Publish Logs and Test Results to Pipeline Artifacts",
+                "label": "Publish Logs and Test Results to Pipeline Build Artifacts.",
                 "defaultValue": "true",
                 "required": true,
-                "helpMarkDown": "This would publish the output the data to build artifacts."
+                "helpMarkDown": "This would publish the output the data to build artifacts. If this task is used in release pipeline, please disable this check."
             },
             {
                 "name": "artifactNameReport",

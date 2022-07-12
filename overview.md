@@ -16,17 +16,15 @@ You need to enable static hosting in the storage container in order to be able t
 
 ![Screenshot](screenshots/Steps.gif)
 
-
 ## Features
 
 - Run Apache JMeter Performance Tests
-- Produces Results for Analysis by publishing it to artifacts.
+- Produces Results for Analysis by publishing it to artifacts for build pipeline.
 - Uploads results to Azure Storage account using Static Store for viewing results through a online link.
 - Cross platform - Can be integrated along with any project
 - Can be used as a regression/integration test in build pipeline to ensure usecases pass per PR Request
 - Can be used to tune and optimize performance based on the analysis.
 - Can Fail task if the JMeter results any failure. This would help in continious integration test to idenitfy any breaking change. Integrating this in build pipeline would help idenify any breaking change before merge to main.
-
 
 
 ## Tech Stack

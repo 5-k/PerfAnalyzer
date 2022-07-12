@@ -1,0 +1,36 @@
+"use strict";
+exports.__esModule = true;
+exports.InputVariableType = exports.InputVariables = void 0;
+var InputVariables;
+(function (InputVariables) {
+    InputVariables["JMX_SOURCE"] = "jmxSource";
+    InputVariables["JMX_SOURCE_RUN_FILE_SOURCE_PATH"] = "jmxsourceRunFilePath";
+    InputVariables["JMX_SOURCE_RUN_FILE_URL"] = "jmxsourceRunFileURL";
+    InputVariables["JMX_PROPERTY_FILE_SOURCE"] = "jmxPropertySource";
+    InputVariables["JMX_PROPERTY_FILE_SOURCE_PATH"] = "jmxPropertySourcePath";
+    InputVariables["JMX_PROPERTY_FILE_URL"] = "jmxPropertySourceURL";
+    InputVariables["JMX_INPUT_FILE_SOURCE"] = "jmxInputFilesSource";
+    InputVariables["JMX_INPUT_FOLDER_SOURCE_PATH"] = "jmxInputFolderSourcePath";
+    InputVariables["JMX_INPUT_FILES_URL"] = "jmxInputFilesUrls";
+    InputVariables["JMX_BINARY_URI"] = "jmeterURI";
+    InputVariables["JMETER_FOLDER_NAME"] = "jmeterFolderName";
+    InputVariables["JMETER_LOG_FOLDER"] = "jmeterLogFolder";
+    InputVariables["JMETER_REPORT_FOLDER"] = "jmeterReportFolder";
+    InputVariables["COPY_RESULT_TO_AZURE_BLOB_STORAGE"] = "copyResultToAzureBlobStorage";
+    InputVariables["PUBLISH_RESULTS_TO_BUILD_ARTIFACT"] = "publishResultsToBuildArtifact";
+    InputVariables["TOKEN_REGEX"] = "tokenRegex";
+    InputVariables["CONNECTED_SERVICE_ARM_NAME"] = "ConnectedServiceNameARM";
+    InputVariables["STORAGE_ACCOUNT_RM"] = "StorageAccountRM";
+    InputVariables["CONTAINER_NAME"] = "ContainerName";
+    InputVariables["BLOB_PREFIX"] = "BlobPrefix";
+    InputVariables["OUTPUT_STORAGE_URI"] = "outputStorageUri";
+    InputVariables["ARTIFACT_NAME_REPORT"] = "artifactNameReport";
+    InputVariables["ARTIFACT_NAME_LOG"] = "artifactNameLog";
+})(InputVariables = exports.InputVariables || (exports.InputVariables = {}));
+var InputVariableType;
+(function (InputVariableType) {
+    InputVariableType["SourceCode"] = "sourceCode";
+    InputVariableType["Url"] = "url";
+    InputVariableType["Urls"] = "urls";
+    InputVariableType["None"] = "none";
+})(InputVariableType = exports.InputVariableType || (exports.InputVariableType = {}));
