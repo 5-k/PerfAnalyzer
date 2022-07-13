@@ -35,8 +35,7 @@ You need to enable static hosting in the storage container in order to be able t
 
 ## Sample Usage
 
-![SAMPLE_USAGE](https://github.com/5-k/PerfAnalyzer/blob/main/samples/README.md)
-
+Follow this Link: [SAMPLE USAGE](https://github.com/5-k/PerfAnalyzer/blob/main/samples/README.md)
 
 ## Screenshots
 
@@ -100,7 +99,7 @@ The following variables are used in the pipeline. Some have default values which
 
 `Artifact Name for Apache Jmeter Logs`: This is the output artifact name for the test logs. Only visible if the `Publish Logs and Test Results to Pipeline Artifacts` is set to true.
 
-`Copy Performance Test Result to Azure Blob Storage`: This is a boolean flag that if set to true nabling this would help to copy Apache Jmeter's Performance Test Report, Log File and JTL File to be copied to Azure Blob Storage. Using Static website hosting turned on you can access any run report later as well via a direct link."
+`Copy Performance Test Result to Azure Blob Storage`: This is a boolean flag that if set to true nabling this would help to copy Apache Jmeter's Performance Test Report, Log File and JTL File to be copied to Azure Blob Storage. Using Static website hosting turned on you can access any run report later as well via a direct link.
 
 `ConnectedServiceNameSelector`: This is a picklist option to specofy where to make azure connection. Currently this is set to Azure Resource Manager only.
 
@@ -126,6 +125,10 @@ These variables are available under the `advanced` section of the pipeline. Thes
 `JMeter Log Folder Name`: This is the name of Log folder that is created as a result of test run. This is defaulted to CurrentLog. This is one of the artifacts that is later published as well.
 
 `JMeter Report Folder Name"`: This is the name of Result folder that is created as a result of test run. This is defaulted to CurrentLog. This is one of the artifacts that is later published as well.
+
+
+## 🚀 About Me
+I am a Full stack Developer working at Microsoft RnD. Connect with me over Linkedin
 
 ## Support
 

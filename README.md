@@ -190,6 +190,9 @@ These variables are available under the `advanced` section of the pipeline. Thes
 
 `JMeter Report Folder Name"`: This is the name of Result folder that is created as a result of test run. This is defaulted to CurrentLog. This is one of the artifacts that is later published as well.
 
+## 🚀 About Me
+I am a Full stack Developer working at Microsoft RnD. Connect with me over Linkedin
+
 ## Support
 
 For support, email at prateek15mishra@gmail.com 
