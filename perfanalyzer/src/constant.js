@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.InputVariableType = exports.InputVariables = void 0;
+exports.DATE_FORMAT = exports.URL_SEPERATOR = exports.JMETER_REPORT_INDEX_FILE_NAME = exports.JMETER_LOG_FILE_NAME = exports.LOG_JTL_FILE_NAME = exports.AZURE_STORAGE_ACCOUNT_NAME_PLACEHOLDER = exports.AZURE_STORAGE_ACCOUNT_URI = exports.DEFAULT_JMETER_LOG_DIR_NAME = exports.DEFAULT_JMETER_REPORT_DIR_NAME = exports.JMETER_BIN_Folder_NAME = exports.JMETER_FILE_NAME = exports.InputVariableType = exports.InputVariables = void 0;
 var InputVariables;
 (function (InputVariables) {
     InputVariables["JMX_SOURCE"] = "jmxSource";
@@ -34,3 +34,14 @@ var InputVariableType;
     InputVariableType["Urls"] = "urls";
     InputVariableType["None"] = "none";
 })(InputVariableType = exports.InputVariableType || (exports.InputVariableType = {}));
+exports.JMETER_FILE_NAME = 'apache-jmeter.tgz';
+exports.JMETER_BIN_Folder_NAME = 'bin';
+exports.DEFAULT_JMETER_REPORT_DIR_NAME = 'CurrentReport';
+exports.DEFAULT_JMETER_LOG_DIR_NAME = 'CurrentLog';
+exports.AZURE_STORAGE_ACCOUNT_URI = 'https://${storageAccountName}.blob.core.windows.net';
+exports.AZURE_STORAGE_ACCOUNT_NAME_PLACEHOLDER = '${storageAccountName}';
+exports.LOG_JTL_FILE_NAME = 'log.jtl';
+exports.JMETER_LOG_FILE_NAME = 'jmeter.log';
+exports.JMETER_REPORT_INDEX_FILE_NAME = 'index.html';
+exports.URL_SEPERATOR = '/';
+exports.DATE_FORMAT = 'DD-MMM-YYYY HH:mm:ss:SSS ZZ';
