@@ -36,9 +36,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.promiseFromChildProcess = exports.handleJMeterInputFile = exports.handleJMeterPropertyFile = exports.handleJMeterJMXFile = void 0;
+exports.analyzeJTL = exports.promiseFromChildProcess = exports.handleJMeterInputFile = exports.handleJMeterPropertyFile = exports.handleJMeterJMXFile = void 0;
 var utility_1 = require("./utility");
 var constant_1 = require("./constant");
+var csv = require('csv-parser');
 var fs = require('fs');
 var tl = require('azure-pipelines-task-lib/task');
 var Path = require('path');
@@ -190,3 +191,29 @@ function promiseFromChildProcess(child) {
     });
 }
 exports.promiseFromChildProcess = promiseFromChildProcess;
+function analyzeJTL(fileNameAndPath, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, fs.createReadStream(fileNameAndPath)
+                        .pipe(csv())
+                        .on('data', function (row) {
+                        res.count++;
+                        if ((row === null || row === void 0 ? void 0 : row.success) == 'true') {
+                            res.successCount++;
+                        }
+                        else {
+                            res.failureCount++;
+                        }
+                    })
+                        .on('end', function () {
+                        console.log('Data loaded');
+                    })];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.analyzeJTL = analyzeJTL;

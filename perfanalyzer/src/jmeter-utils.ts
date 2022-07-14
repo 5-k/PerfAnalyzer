@@ -1,5 +1,7 @@
 import {logInformation, isEmpty, copyFileToDirectory, downloadFile, copyDirectoryRecursiveSync} from './utility'
 import {InputVariables, InputVariableType } from './constant'
+import { JMeterTestResults } from './model'
+let csv = require('csv-parser')
 const fs = require('fs');
 const tl = require('azure-pipelines-task-lib/task'); 
 const Path = require('path'); 
@@ -112,4 +114,21 @@ export function promiseFromChildProcess(child) {
         child.addListener("error", reject);
         child.addListener("exit", resolve);
     });
+}
+
+
+export async function analyzeJTL(fileNameAndPath: string, res:JMeterTestResults)  { 
+    await fs.createReadStream(fileNameAndPath)
+    .pipe(csv())
+        .on('data', function (row: any) { 
+        res.count++;
+        if(row?.success=='true') {
+            res.successCount++;
+        } else {
+            res.failureCount++
+        } 
+    })
+    .on('end', function () {
+        console.log('Data loaded')
+    }) 
 }

@@ -1,11 +1,10 @@
 import * as moment from 'moment'; 
 import { DATE_FORMAT } from './constant'
-
 const tl = require('azure-pipelines-task-lib/task'); 
 const fs = require('fs');
 const https = require('https');
 const Path = require('path'); 
-var tar = require('tar');
+let tar = require('tar');
 
 export function logInformation(data: any, printDate: boolean = true) {
     if(printDate) {
@@ -15,8 +14,7 @@ export function logInformation(data: any, printDate: boolean = true) {
     } else {
         console.log(data);
         tl.debug(data)
-    }
-    
+    }    
 }
 
 export async function downloadFile(fileSource: string, destinationFilePath: string) {
@@ -37,7 +35,6 @@ export async function downloadFile(fileSource: string, destinationFilePath: stri
         }).on("error", reject);
     });
 }
-
 
 export async function unzipBinary(fileName: string) {    
     await tar.x({file: fileName});
@@ -71,8 +68,6 @@ export function copyDirectoryRecursiveSync(source, target, move): string[] {
     });
     return files;
 }
-
-
 
 export function isEmpty(str: string|undefined|null): boolean {
     return (!str || str.length == 0) 
