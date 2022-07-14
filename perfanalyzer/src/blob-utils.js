@@ -88,7 +88,9 @@ function copyResultsToAzureBlob(reportFolderName, logFolderName) {
                     return [3 /*break*/, 7];
                 case 6:
                     e_1 = _b.sent();
+                    tl.error(e_1);
                     (0, utility_1.logInformation)('Error Publishing report to blob storage: ' + (e_1 === null || e_1 === void 0 ? void 0 : e_1.message));
+                    (0, utility_1.logInformation)(constant_1.ERROR_DEFAULT_MSG);
                     return [3 /*break*/, 7];
                 case 7:
                     logFolderABSPath = Path.join(process.cwd(), logFolderName);
@@ -102,7 +104,9 @@ function copyResultsToAzureBlob(reportFolderName, logFolderName) {
                     return [3 /*break*/, 11];
                 case 10:
                     e_2 = _b.sent();
+                    tl.error(e_2);
                     (0, utility_1.logInformation)('Error Publishing LOGS to blob storage: ' + (e_2 === null || e_2 === void 0 ? void 0 : e_2.message));
+                    (0, utility_1.logInformation)(constant_1.ERROR_DEFAULT_MSG);
                     return [3 /*break*/, 11];
                 case 11:
                     outputStorageUri = tl.getInput(constant_1.InputVariables.OUTPUT_STORAGE_URI);
@@ -144,6 +148,7 @@ function uploadBlob(src, uploadFolderName, blobPrefix, destContainerClient) {
                                 case 0:
                                     if (!err) return [3 /*break*/, 1];
                                     (0, utility_1.logInformation)(err);
+                                    tl.error(err);
                                     return [3 /*break*/, 7];
                                 case 1:
                                     _i = 0, files_1 = files;

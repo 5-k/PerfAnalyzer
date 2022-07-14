@@ -37,6 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 exports.publishData = void 0;
+var constant_1 = require("./constant");
 var utility_1 = require("./utility");
 var tl = require('azure-pipelines-task-lib/task');
 var Path = require('path');
@@ -49,9 +50,11 @@ function publishData(pathToPublish, artifactName) {
             //logInformation('ResourcePath: ' + Path.join(__dirname, 'task.json'));    
             (0, utility_1.logInformation)('Current Working directory: ' + process.cwd());
             hostType = tl.getVariable('system.hostType');
+            (0, utility_1.logInformation)('Host Type is: ' + hostType);
             if ((hostType && hostType.toUpperCase() != 'BUILD')) {
-                (0, utility_1.logInformation)('Unable to upload Result: ErrorHostTypeNotSupported');
-                return [2 /*return*/];
+                (0, utility_1.logInformation)('Please note this is not a build pipeline and hence publishing artifacts might not be successful. You are requested to use te extension either in build pipeline or use the azure storage static store to host your results.');
+                (0, utility_1.logInformation)(constant_1.ERROR_DEFAULT_MSG);
+                //return;
             }
             data = {
                 artifacttype: 'Container',

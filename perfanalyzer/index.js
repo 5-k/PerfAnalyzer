@@ -60,6 +60,8 @@ function PostResults(jmeterReportFolder, jmeterLogFolder, JMETER_ABS_BIN_Folder)
                     }
                     catch (e) {
                         (0, utility_1.logInformation)('Error Publishing report to blob storage: ' + (e === null || e === void 0 ? void 0 : e.message));
+                        tl.error(e);
+                        (0, utility_1.logInformation)(constant_1.ERROR_DEFAULT_MSG);
                     }
                     ReportABSPath = Path.join(JMETER_ABS_BIN_Folder, jmeterReportFolder);
                     LogABSPath = Path.join(JMETER_ABS_BIN_Folder, jmeterReportFolder);
@@ -78,8 +80,10 @@ function PostResults(jmeterReportFolder, jmeterLogFolder, JMETER_ABS_BIN_Folder)
                     return [3 /*break*/, 4];
                 case 3:
                     e_1 = _a.sent();
+                    tl.error(e_1);
                     (0, utility_1.logInformation)('Error Publishing log: ' + (e_1 === null || e_1 === void 0 ? void 0 : e_1.message));
                     (0, utility_1.logInformation)('Artifacts {LOG} are present at location: ' + LogABSPath);
+                    (0, utility_1.logInformation)(constant_1.ERROR_DEFAULT_MSG);
                     return [3 /*break*/, 4];
                 case 4:
                     (0, utility_1.logInformation)('Publishing data to build artifacts: Report ');
@@ -93,8 +97,10 @@ function PostResults(jmeterReportFolder, jmeterLogFolder, JMETER_ABS_BIN_Folder)
                     return [3 /*break*/, 8];
                 case 7:
                     e_2 = _a.sent();
+                    tl.error(e_2);
                     (0, utility_1.logInformation)('Error Publishing report: ' + (e_2 === null || e_2 === void 0 ? void 0 : e_2.message));
                     (0, utility_1.logInformation)('Artifacts {Report} are present at location: ' + ReportABSPath);
+                    (0, utility_1.logInformation)(constant_1.ERROR_DEFAULT_MSG);
                     return [3 /*break*/, 8];
                 case 8: return [2 /*return*/];
             }
@@ -200,6 +206,7 @@ function main() {
                         PostResults(jmeterReportFolder_1, jmeterLogFolder_1, JMETER_ABS_BIN_Folder_1);
                         (0, utility_1.logInformation)('Task Completed.');
                     }, function (err) {
+                        tl.error(err);
                         (0, utility_1.logInformation)('promise rejected: ' + err);
                     });
                     child.stdout.on('data', function (data) {
@@ -217,7 +224,9 @@ function main() {
                     return [3 /*break*/, 16];
                 case 15:
                     err_1 = _b.sent();
+                    tl.error(err_1);
                     (0, utility_1.logInformation)(err_1);
+                    (0, utility_1.logInformation)(constant_1.ERROR_DEFAULT_MSG);
                     tl.setResult(tl.TaskResult.Failed, err_1 === null || err_1 === void 0 ? void 0 : err_1.message);
                     return [3 /*break*/, 16];
                 case 16: return [2 /*return*/];

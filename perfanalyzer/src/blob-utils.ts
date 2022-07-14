@@ -1,5 +1,5 @@
 import {logInformation, isNonEmpty} from './utility'
-import {InputVariables, LOG_JTL_FILE_NAME, JMETER_LOG_FILE_NAME, JMETER_REPORT_INDEX_FILE_NAME, URL_SEPERATOR, AZURE_STORAGE_ACCOUNT_URI, AZURE_STORAGE_ACCOUNT_NAME_PLACEHOLDER } from './constant'
+import {InputVariables, LOG_JTL_FILE_NAME, JMETER_LOG_FILE_NAME, JMETER_REPORT_INDEX_FILE_NAME, URL_SEPERATOR, AZURE_STORAGE_ACCOUNT_URI, AZURE_STORAGE_ACCOUNT_NAME_PLACEHOLDER, ERROR_DEFAULT_MSG } from './constant'
 import { BlobServiceClient, StorageSharedKeyCredential } from "@azure/storage-blob";
 import { AzureRMEndpoint } from 'azure-pipelines-tasks-azure-arm-rest-v2/azure-arm-endpoint';
 import { AzureEndpoint, StorageAccount } from 'azure-pipelines-tasks-azure-arm-rest-v2/azureModels';
@@ -37,7 +37,9 @@ export async function copyResultsToAzureBlob(reportFolderName: string, logFolder
     try { 
         await uploadBlob(reportFolderABSPath, reportFolderName, blobPrefix, destContainerClient);
     } catch (e) {
+        tl.error(e);
         logInformation('Error Publishing report to blob storage: ' + e?.message)
+        logInformation(ERROR_DEFAULT_MSG);
     }
     
     let logFolderABSPath = Path.join(process.cwd(), logFolderName);
@@ -45,7 +47,9 @@ export async function copyResultsToAzureBlob(reportFolderName: string, logFolder
     try { 
         await uploadBlob(logFolderABSPath, logFolderName, blobPrefix, destContainerClient);
     } catch (e) {
+        tl.error(e);
         logInformation('Error Publishing LOGS to blob storage: ' + e?.message)
+        logInformation(ERROR_DEFAULT_MSG);
     }
 
     let outputStorageUri = tl.getInput(InputVariables.OUTPUT_STORAGE_URI);
@@ -76,8 +80,10 @@ export async function uploadBlob(src: string, uploadFolderName: string,  blobPre
     await fs.readdir(src, {withFileTypes: true}, 
         async (err, files) => {
         
-        if (err)
-          logInformation(err);
+        if (err) {
+            logInformation(err);
+            tl.error(err);
+        }
         else {
             for(let entry of files) {
                 const srcPath = Path.join(src, entry.name);

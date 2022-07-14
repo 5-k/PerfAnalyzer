@@ -42,3 +42,4 @@ export const JMETER_LOG_FILE_NAME = 'jmeter.log';
 export const JMETER_REPORT_INDEX_FILE_NAME = 'index.html';
 export const URL_SEPERATOR = '/'; 
 export const DATE_FORMAT = 'DD-MMM-YYYY HH:mm:ss:SSS ZZ';
+export const ERROR_DEFAULT_MSG = 'Please note this extension is in beta version. We will be fixing the issues as reported and hence it is important for us to be able to analyze logs and fix the issue. If you encounter any issue please email at prateek.mishra@microsoft.com'

@@ -1,6 +1,6 @@
 "use strict";
 exports.__esModule = true;
-exports.DATE_FORMAT = exports.URL_SEPERATOR = exports.JMETER_REPORT_INDEX_FILE_NAME = exports.JMETER_LOG_FILE_NAME = exports.LOG_JTL_FILE_NAME = exports.AZURE_STORAGE_ACCOUNT_NAME_PLACEHOLDER = exports.AZURE_STORAGE_ACCOUNT_URI = exports.DEFAULT_JMETER_LOG_DIR_NAME = exports.DEFAULT_JMETER_REPORT_DIR_NAME = exports.JMETER_BIN_Folder_NAME = exports.JMETER_FILE_NAME = exports.InputVariableType = exports.InputVariables = void 0;
+exports.ERROR_DEFAULT_MSG = exports.DATE_FORMAT = exports.URL_SEPERATOR = exports.JMETER_REPORT_INDEX_FILE_NAME = exports.JMETER_LOG_FILE_NAME = exports.LOG_JTL_FILE_NAME = exports.AZURE_STORAGE_ACCOUNT_NAME_PLACEHOLDER = exports.AZURE_STORAGE_ACCOUNT_URI = exports.DEFAULT_JMETER_LOG_DIR_NAME = exports.DEFAULT_JMETER_REPORT_DIR_NAME = exports.JMETER_BIN_Folder_NAME = exports.JMETER_FILE_NAME = exports.InputVariableType = exports.InputVariables = void 0;
 var InputVariables;
 (function (InputVariables) {
     InputVariables["JMX_SOURCE"] = "jmxSource";
@@ -45,3 +45,4 @@ exports.JMETER_LOG_FILE_NAME = 'jmeter.log';
 exports.JMETER_REPORT_INDEX_FILE_NAME = 'index.html';
 exports.URL_SEPERATOR = '/';
 exports.DATE_FORMAT = 'DD-MMM-YYYY HH:mm:ss:SSS ZZ';
+exports.ERROR_DEFAULT_MSG = 'Please note this extension is in beta version. We will be fixing the issues as reported and hence it is important for us to be able to analyze logs and fix the issue. If you encounter any issue please email at prateek.mishra@microsoft.com';

@@ -1,3 +1,4 @@
+import { ERROR_DEFAULT_MSG } from './constant';
 import {logInformation } from './utility'
 const tl = require('azure-pipelines-task-lib/task');
 const Path = require('path'); 
@@ -8,9 +9,11 @@ export async function publishData(pathToPublish: string, artifactName: string) {
     //logInformation('ResourcePath: ' + Path.join(__dirname, 'task.json'));    
     logInformation('Current Working directory: ' +  process.cwd());
     let hostType = tl.getVariable('system.hostType');
+    logInformation('Host Type is: ' + hostType);
     if ((hostType && hostType.toUpperCase() != 'BUILD')) {
-        logInformation('Unable to upload Result: ErrorHostTypeNotSupported');
-        return;
+        logInformation('Please note this is not a build pipeline and hence publishing artifacts might not be successful. You are requested to use te extension either in build pipeline or use the azure storage static store to host your results.');
+        logInformation(ERROR_DEFAULT_MSG);
+        //return;
     }
 
     let data = {

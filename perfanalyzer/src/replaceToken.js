@@ -106,6 +106,8 @@ function replaceTokens(fileName) {
                 }
             }
             catch (err) {
+                tl.error(err);
+                (0, utility_1.logInformation)(constant_1.ERROR_DEFAULT_MSG);
                 msg = err;
                 if (err.message) {
                     msg = err.message;

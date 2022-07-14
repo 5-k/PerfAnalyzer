@@ -1,5 +1,5 @@
 import {logInformation } from './utility'
-import {InputVariables, InputVariableType } from './constant'
+import {ERROR_DEFAULT_MSG, InputVariables, InputVariableType } from './constant'
 const tl = require('azure-pipelines-task-lib/task'); 
 const fs = require('fs');
 const sh = require('shelljs'); 
@@ -82,6 +82,8 @@ export async function replaceTokens(fileName: string | null | undefined) {
         }
 
     } catch (err :any) {
+        tl.error(err);
+        logInformation(ERROR_DEFAULT_MSG);
         let msg = err;
         if (err.message) {
             msg = err.message;

@@ -1,5 +1,5 @@
 import {logInformation, isEmpty, copyFileToDirectory, downloadFile, copyDirectoryRecursiveSync} from './utility'
-import {InputVariables, InputVariableType } from './constant'
+import {ERROR_DEFAULT_MSG, InputVariables, InputVariableType } from './constant'
 import { JMeterTestResults } from './model'
 let csv = require('csv-parser')
 const fs = require('fs');
@@ -101,7 +101,9 @@ export async function handleJMeterInputFile(JMETER_BIN_Folder: string): Promise<
                 await downloadFile(file, fileName);            
                 fileNames.push(fileName);
            } catch(e) {
+            tl.error(e);
             logInformation('Could not download File: ' + file)
+            logInformation(ERROR_DEFAULT_MSG);
            }
            
         }
@@ -127,8 +129,9 @@ export async function analyzeJTL(fileNameAndPath: string, res:JMeterTestResults)
         } else {
             res.failureCount++
         } 
-    })
+    }
+    )
     .on('end', function () {
-        console.log('Data loaded')
+        return res;
     }) 
 }

@@ -173,7 +173,9 @@ function handleJMeterInputFile(JMETER_BIN_Folder) {
                     return [3 /*break*/, 7];
                 case 6:
                     e_1 = _a.sent();
+                    tl.error(e_1);
                     (0, utility_1.logInformation)('Could not download File: ' + file);
+                    (0, utility_1.logInformation)(constant_1.ERROR_DEFAULT_MSG);
                     return [3 /*break*/, 7];
                 case 7:
                     _i++;
@@ -207,7 +209,7 @@ function analyzeJTL(fileNameAndPath, res) {
                         }
                     })
                         .on('end', function () {
-                        console.log('Data loaded');
+                        return res;
                     })];
                 case 1:
                     _a.sent();

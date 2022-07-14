@@ -1,4 +1,4 @@
-import {InputVariables, InputVariableType, JMETER_FILE_NAME, JMETER_BIN_Folder_NAME, DEFAULT_JMETER_REPORT_DIR_NAME, DEFAULT_JMETER_LOG_DIR_NAME, LOG_JTL_FILE_NAME, JMETER_LOG_FILE_NAME } from './src/constant'
+import {InputVariables, InputVariableType, JMETER_FILE_NAME, JMETER_BIN_Folder_NAME, DEFAULT_JMETER_REPORT_DIR_NAME, DEFAULT_JMETER_LOG_DIR_NAME, LOG_JTL_FILE_NAME, JMETER_LOG_FILE_NAME, ERROR_DEFAULT_MSG } from './src/constant'
 import {replaceTokens } from './src/replaceToken'
 import { publishData } from './src/azure-task-lib.utility'
 import { downloadFile, unzipBinary, logInformation, isEmpty } from './src/utility'
@@ -17,6 +17,8 @@ async function PostResults(jmeterReportFolder: string, jmeterLogFolder: string, 
         } 
     } catch (e) {
         logInformation('Error Publishing report to blob storage: ' + e?.message)
+        tl.error(e);
+        logInformation(ERROR_DEFAULT_MSG);
     }
     
     let ReportABSPath = Path.join(JMETER_ABS_BIN_Folder,jmeterReportFolder);
@@ -33,8 +35,10 @@ async function PostResults(jmeterReportFolder: string, jmeterLogFolder: string, 
             await publishData(LogABSPath, artifactLOG);
             logInformation('Completed: Publishing data to build artifacts: Log ');
         } catch(e: any) {
+            tl.error(e);
             logInformation('Error Publishing log: ' + e?.message);
             logInformation('Artifacts {LOG} are present at location: ' + LogABSPath);
+            logInformation(ERROR_DEFAULT_MSG);
         }
 
         logInformation('Publishing data to build artifacts: Report ');
@@ -42,8 +46,10 @@ async function PostResults(jmeterReportFolder: string, jmeterLogFolder: string, 
             await publishData(ReportABSPath, artifactReport);
             logInformation('Completed: Publishing data to build artifacts: Report ');
         } catch(e: any) {
+            tl.error(e);
             logInformation('Error Publishing report: ' + e?.message);
             logInformation('Artifacts {Report} are present at location: ' + ReportABSPath);
+            logInformation(ERROR_DEFAULT_MSG);
         }
        
     }
@@ -139,6 +145,7 @@ async function main() {
             PostResults(jmeterReportFolder, jmeterLogFolder, JMETER_ABS_BIN_Folder);
             logInformation('Task Completed.')
         }, function (err) {
+            tl.error(err);
             logInformation('promise rejected: ' + err);
         });
         
@@ -154,7 +161,9 @@ async function main() {
         const { stdout, stderr } = await child;
       
     } catch (err: any) {
+        tl.error(err);
         logInformation(err);
+        logInformation(ERROR_DEFAULT_MSG);
         tl.setResult(tl.TaskResult.Failed, err?.message);
     }    
 }
