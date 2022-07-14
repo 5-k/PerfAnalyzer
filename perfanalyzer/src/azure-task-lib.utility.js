@@ -44,9 +44,10 @@ function publishData(pathToPublish, artifactName) {
     return __awaiter(this, void 0, void 0, function () {
         var hostType, data;
         return __generator(this, function (_a) {
-            (0, utility_1.logInformation)('Started Uploading Artifacts from : ' + pathToPublish + ' to location: ' + pathToPublish);
-            tl.setResourcePath(Path.join(__dirname, 'task.json'));
-            (0, utility_1.logInformation)('ResourcePath: ' + Path.join(__dirname, 'task.json'));
+            //logInformation('Started Uploading Artifacts from : ' + pathToPublish + ' to location: ' + pathToPublish);
+            //tl.setResourcePath(Path.join(__dirname, 'task.json')); 
+            //logInformation('ResourcePath: ' + Path.join(__dirname, 'task.json'));    
+            (0, utility_1.logInformation)('Current Working directory: ' + process.cwd());
             hostType = tl.getVariable('system.hostType');
             if ((hostType && hostType.toUpperCase() != 'BUILD')) {
                 (0, utility_1.logInformation)('Unable to upload Result: ErrorHostTypeNotSupported');
