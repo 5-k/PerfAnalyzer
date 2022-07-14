@@ -30,3 +30,15 @@ export enum InputVariableType {
     Urls = 'urls',
     None = 'none'
 }
+
+export const JMETER_FILE_NAME='apache-jmeter.tgz'
+export const JMETER_BIN_Folder_NAME= 'bin'   
+export const DEFAULT_JMETER_REPORT_DIR_NAME = 'CurrentReport';
+export const DEFAULT_JMETER_LOG_DIR_NAME = 'CurrentLog'; 
+export const AZURE_STORAGE_ACCOUNT_URI = 'https://${storageAccountName}.blob.core.windows.net';
+export const AZURE_STORAGE_ACCOUNT_NAME_PLACEHOLDER = '${storageAccountName}';
+export const LOG_JTL_FILE_NAME = 'log.jtl';
+export const JMETER_LOG_FILE_NAME = 'jmeter.log'; 
+export const JMETER_REPORT_INDEX_FILE_NAME = 'index.html';
+export const URL_SEPERATOR = '/'; 
+export const DATE_FORMAT = 'DD-MMM-YYYY HH:mm:ss:SSS ZZ';
