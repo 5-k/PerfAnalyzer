@@ -8,3 +8,12 @@ perfanalyzer/.history*
 apache*
 perfanalyzer/apache*
 perfanalyzer/package-lock.json
+perfanalyzer/index.js
+perfanalyzer/src/azure-task-lib.utility.js
+perfanalyzer/src/blob-utils.js
+perfanalyzer/src/constant.js
+perfanalyzer/src/jmeter-utils.js
+perfanalyzer/src/model.js
+perfanalyzer/src/replaceTokens.js
+perfanalyzer/src/utility.js
+.taskkey
