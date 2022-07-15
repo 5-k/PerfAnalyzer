@@ -10,7 +10,7 @@
     "version": {
         "Major": 1,
         "Minor": 1,
-        "Patch": 54
+        "Patch": 55
     },
     "instanceNameFormat": "Run Perf Analyzer",
     "groups": [
@@ -226,7 +226,7 @@
                 "label": "Blob Prefix",
                 "defaultValue": "Releases/Release_$(Build.BuildNumber)",
                 "required": false,
-                "helpMarkDown": "This is the prefix inside container name where each run's report will be copied. It is essential to note that for continious integration and testing it's best to prefix it will build number. This way all continious build's result will be made available at all times as a http exposed url.",
+                "helpMarkDown": "This is the prefix inside container name where each run's report will be copied. It is essential to note that for continious integration and testing it's best to prefix it will build number. This way all continious build's result will be made available at all times as a http exposed url. If used in Build pipeline, it can be Releases/Release_$(Build.BuildNumber), if in release then it can be Releases/Release_$(Release.ReleaseId)",
                 "visibleRule": "Destination = AzureBlob && copyResultToAzureBlobStorage=true"
             },
             {

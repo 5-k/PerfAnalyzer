@@ -6,7 +6,7 @@
             "request": "launch",
             "name": "index",         
             "args": [
-                "index.ts"
+                "test.ts"
             ],
             "runtimeArgs": [
                 "-r",
