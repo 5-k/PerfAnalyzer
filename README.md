@@ -14,7 +14,7 @@ You need to enable static hosting in the storage container in order to be able t
 
 ## Latest Updates 
 
-#### V1.2.56
+#### V1.2.57
 - Enabled Log analysis for JMeter. Pipeline can be marked as failed if failure count increase threshold specified.
 
 #### V1.1.55

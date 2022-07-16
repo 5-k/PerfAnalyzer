@@ -10,7 +10,7 @@
     "version": {
         "Major": 1,
         "Minor": 2,
-        "Patch": 56
+        "Patch": 57
     },
     "instanceNameFormat": "Run Perf Analyzer",
     "groups": [
@@ -160,7 +160,7 @@
             },
             {
                 "name": "maxFailureCountForJMeter",
-                "type": "boolean",
+                "type": "string",
                 "label": "Fail Task if test failure count is more than",
                 "defaultValue": "100",
                 "required": true,
