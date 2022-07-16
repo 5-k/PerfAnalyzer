@@ -12,6 +12,14 @@ The pipeline task downloads your JMX, Propert File, Inpur files and then runs th
 You can additionally host the data on a web url by using the Static Website hosting capacity of Azure storage account. The task publishes the results to your $web container of your storage container. 
 You need to enable static hosting in the storage container in order to be able to view html results. These results are published and ready for view immediately after test result. The link of hosted website is available in the logs.
 
+## Latest Updates 
+
+#### V1.2.56
+- Enabled Log analysis for JMeter. Pipeline can be marked as failed if failure count increase threshold specified.
+
+#### V1.1.55
+- Stable Version.
+
 ## Demo
 
 ![Screenshot](screenshots/Steps.gif)
@@ -162,6 +170,10 @@ The following variables are used in the pipeline. Some have default values which
 `Artifact Name for Apache Jmeter Reports`: This is the output artifact name for the test results. Only visible if the `Publish Logs and Test Results to Pipeline Artifacts` is set to true.
 
 `Artifact Name for Apache Jmeter Logs`: This is the output artifact name for the test logs. Only visible if the `Publish Logs and Test Results to Pipeline Artifacts` is set to true.
+
+`Fail Task if JMeter test fails`: This would fail the pipeline task in case any test fails. This is useful if your usecase is to identify any regression failure due to new deloyment. Enabling this in CICD would help you monitor failures in jmx by failing the task itself.
+
+`Fail Task if test failure count is more than`: In case your JMeter test failure count is more than the number specified, then the pipeline will fail.
 
 `Copy Performance Test Result to Azure Blob Storage`: This is a boolean flag that if set to true nabling this would help to copy Apache Jmeter's Performance Test Report, Log File and JTL File to be copied to Azure Blob Storage. Using Static website hosting turned on you can access any run report later as well via a direct link."
 
