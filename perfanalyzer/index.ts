@@ -3,7 +3,7 @@ import {replaceTokens } from './src/replaceToken'
 import { publishData } from './src/azure-task-lib.utility'
 import { downloadFile, unzipBinary, logInformation, isEmpty } from './src/utility'
 import { copyResultsToAzureBlob} from './src/blob-utils'
-import {handleJMeterInputFile, handleJMeterJMXFile, handleJMeterPropertyFile, promiseFromChildProcess} from './src/jmeter-utils'
+import { analyzeJTL, handleJMeterInputFile, handleJMeterJMXFile, handleJMeterPropertyFile, promiseFromChildProcess} from './src/jmeter-utils'
 const tl = require('azure-pipelines-task-lib/task');
 const Path = require('path'); 
 var exec = require('child_process').exec;
@@ -12,8 +12,9 @@ async function PostResults(jmeterReportFolder: string, jmeterLogFolder: string, 
     try { 
         let copyToBlob = tl.getBoolInput(InputVariables.COPY_RESULT_TO_AZURE_BLOB_STORAGE, true);
         if(copyToBlob) {
-            logInformation('Copying Test Results to Azure blob storage.')
-            copyResultsToAzureBlob(jmeterReportFolder, jmeterLogFolder);
+            logInformation('Started: Copying Test Results to Azure blob storage.')
+            await copyResultsToAzureBlob(jmeterReportFolder, jmeterLogFolder);
+            logInformation('Completed: Copying Test Results to Azure blob storage.')
         } 
     } catch (e) {
         logInformation('Error Publishing report to blob storage: ' + e?.message)
@@ -51,7 +52,9 @@ async function PostResults(jmeterReportFolder: string, jmeterLogFolder: string, 
             logInformation('Artifacts {Report} are present at location: ' + ReportABSPath);
             logInformation(ERROR_DEFAULT_MSG);
         }
-       
+        analyzeJTL(jmeterLogFolder);
+    } else {
+        analyzeJTL(jmeterLogFolder);
     }
 }
 
@@ -147,6 +150,7 @@ async function main() {
         }, function (err) {
             tl.error(err);
             logInformation('promise rejected: ' + err);
+            logInformation(ERROR_DEFAULT_MSG)
         });
         
         child.stdout.on('data', function (data) {
