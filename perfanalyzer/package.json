@@ -1,6 +1,6 @@
 {
   "name": "microsoftperfanalyzer",
-  "version": "1.1.34",
+  "version": "1.2.35",
   "description": "This task enables to run Performance testng using Apache Jmeter, Analyze report and post results",
   "main": "index.js",
   "scripts": {
@@ -11,8 +11,11 @@
   "license": "ISC",
   "dependencies": {
     "@azure/storage-blob": "^12.10.0",
+    "applicationinsights": "^2.3.3",
+    "applicationinsights-native-metrics": "0.0.7",
     "azure-pipelines-task-lib": "^3.3.1",
     "azure-pipelines-tasks-azure-arm-rest-v2": "2.205.0",
+   
     "child_process": "^1.0.2",
     "csv-parser": "^3.0.0",
     "fs": "0.0.1-security",

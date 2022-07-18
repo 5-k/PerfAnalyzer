@@ -4,6 +4,7 @@ import { publishData } from './src/azure-task-lib.utility'
 import { downloadFile, unzipBinary, logInformation, isEmpty } from './src/utility'
 import { copyResultsToAzureBlob} from './src/blob-utils'
 import { analyzeJTL, handleJMeterInputFile, handleJMeterJMXFile, handleJMeterPropertyFile, promiseFromChildProcess} from './src/jmeter-utils'
+import { enableAppInsights, LogEvent } from './src/telemetry-client'
 const tl = require('azure-pipelines-task-lib/task');
 const Path = require('path'); 
 var exec = require('child_process').exec;
@@ -12,6 +13,9 @@ async function PostResults(jmeterReportFolder: string, jmeterLogFolder: string, 
     try { 
         let copyToBlob = tl.getBoolInput(InputVariables.COPY_RESULT_TO_AZURE_BLOB_STORAGE, true);
         if(copyToBlob) {
+            let event = 'Copying Test Results to Azure blob storage.';
+            LogEvent(event);
+            
             logInformation('Started: Copying Test Results to Azure blob storage.')
             await copyResultsToAzureBlob(jmeterReportFolder, jmeterLogFolder);
             logInformation('Completed: Copying Test Results to Azure blob storage.')
@@ -30,8 +34,9 @@ async function PostResults(jmeterReportFolder: string, jmeterLogFolder: string, 
     if(publishResultsToBuildArtifact) {
         let artifactReport = tl.getInput(InputVariables.ARTIFACT_NAME_REPORT,true);
         let artifactLOG = tl.getInput(InputVariables.ARTIFACT_NAME_LOG,true);                
-
-        logInformation('Publishing data to build artifacts: Log ');
+        let event1 = 'Publishing data to build artifacts: Log ';
+        LogEvent(event1);
+        logInformation(event1);
         try {
             await publishData(LogABSPath, artifactLOG);
             logInformation('Completed: Publishing data to build artifacts: Log ');
@@ -41,8 +46,10 @@ async function PostResults(jmeterReportFolder: string, jmeterLogFolder: string, 
             logInformation('Artifacts {LOG} are present at location: ' + LogABSPath);
             logInformation(ERROR_DEFAULT_MSG);
         }
-
-        logInformation('Publishing data to build artifacts: Report ');
+ 
+        let event2 = 'Publishing data to build artifacts: Report ';
+        LogEvent(event2);
+        logInformation(event2);
         try {
             await publishData(ReportABSPath, artifactReport);
             logInformation('Completed: Publishing data to build artifacts: Report ');
@@ -60,6 +67,7 @@ async function PostResults(jmeterReportFolder: string, jmeterLogFolder: string, 
 
 async function main() {
     try {
+        
         let JMETER_URL = tl.getInput(InputVariables.JMX_BINARY_URI,true);
         let JMETER_FILE_Folder = tl.getInput(InputVariables.JMETER_FOLDER_NAME,true);
         let JMETER_BIN_Folder = Path.join(JMETER_FILE_Folder, JMETER_BIN_Folder_NAME);
@@ -171,5 +179,6 @@ async function main() {
         tl.setResult(tl.TaskResult.Failed, err?.message);
     }    
 }
- 
+
+enableAppInsights();
 main();

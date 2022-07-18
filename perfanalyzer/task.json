@@ -9,8 +9,8 @@
     "author": "Microsoft",
     "version": {
         "Major": 1,
-        "Minor": 2,
-        "Patch": 57
+        "Minor": 3,
+        "Patch": 62
     },
     "instanceNameFormat": "Run Perf Analyzer",
     "groups": [
@@ -294,6 +294,18 @@
                 "helpMarkDown": "This is the name of Result folder that is created as a result of test run. This is defaulted to CurrentLog. This is one of the artifacts that is later published as well."
             }
     ], 
+    "dataSourceBindings": [
+        {
+            "target": "StorageAccount",
+            "endpointId": "$(ConnectedServiceName)",
+            "dataSourceName": "AzureStorageServiceNames"
+        },
+        {
+            "target": "StorageAccountRM",
+            "endpointId": "$(ConnectedServiceNameARM)",
+            "dataSourceName": "AzureStorageAccountRM"
+        }
+    ],
     "execution": {
         "Node10": {
             "target": "index.js"

@@ -14,11 +14,19 @@ You need to enable static hosting in the storage container in order to be able t
 
 ## Latest Updates 
 
+#### V1.3.62
+- Fixed Issue for Storage Account Binding Name
+
 #### V1.2.57
 - Enabled Log analysis for JMeter. Pipeline can be marked as failed if failure count increase threshold specified.
 
 #### V1.1.55
 - Stable Version.
+
+## Demo
+
+![Screenshot](screenshots/Steps.gif)
+
 
 ## Demo
 

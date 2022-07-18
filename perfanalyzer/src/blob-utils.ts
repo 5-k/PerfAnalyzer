@@ -3,6 +3,7 @@ import {InputVariables, LOG_JTL_FILE_NAME, JMETER_LOG_FILE_NAME, JMETER_REPORT_I
 import { BlobServiceClient, StorageSharedKeyCredential } from "@azure/storage-blob";
 import { AzureRMEndpoint } from 'azure-pipelines-tasks-azure-arm-rest-v2/azure-arm-endpoint';
 import { AzureEndpoint, StorageAccount } from 'azure-pipelines-tasks-azure-arm-rest-v2/azureModels';
+import { LogEvent } from './telemetry-client';
 const fs = require('fs');
 const tl = require('azure-pipelines-task-lib/task'); 
 const Path = require('path'); 
@@ -33,7 +34,9 @@ export async function copyResultsToAzureBlob(reportFolderName: string, logFolder
     let blobPrefix = tl.getInput(InputVariables.BLOB_PREFIX);
     
     let reportFolderABSPath = Path.join(process.cwd(), reportFolderName);
-    logInformation('Uploading Reports to Blob Storage from path: ' + reportFolderABSPath + ' to BlobStorageAccount: ' + storageAccountName + ' and container Name: ' + destContainerName + " at path: " + Path.join(blobPrefix,reportFolderName));
+    let event1 = 'Uploading Reports to Blob Storage from path: ' + reportFolderABSPath + ' to BlobStorageAccount: ' + storageAccountName + ' and container Name: ' + destContainerName + " at path: " + Path.join(blobPrefix,reportFolderName);
+    logInformation(event1);  
+    LogEvent(event1);
     try { 
         await uploadBlob(reportFolderABSPath, reportFolderName, blobPrefix, destContainerClient);
     } catch (e) {
@@ -43,7 +46,9 @@ export async function copyResultsToAzureBlob(reportFolderName: string, logFolder
     }
     
     let logFolderABSPath = Path.join(process.cwd(), logFolderName);
-    logInformation('Uploading Logs to Blob Storage from path: ' + logFolderABSPath + ' to BlobStorageAccount: ' + storageAccountName + ' and container Name: ' + destContainerName + " at path: " + Path.join(blobPrefix,logFolderName));
+    let event2 = 'Uploading Logs to Blob Storage from path: ' + logFolderABSPath + ' to BlobStorageAccount: ' + storageAccountName + ' and container Name: ' + destContainerName + " at path: " + Path.join(blobPrefix,logFolderName);
+    logInformation(event2);  
+    LogEvent(event2);
     try { 
         await uploadBlob(logFolderABSPath, logFolderName, blobPrefix, destContainerClient);
     } catch (e) {
