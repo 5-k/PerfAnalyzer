@@ -1,4 +1,5 @@
 import { ERROR_DEFAULT_MSG } from './constant';
+import { LogEvent } from './telemetry-client';
 import {logInformation } from './utility'
 const tl = require('azure-pipelines-task-lib/task');
 
@@ -27,6 +28,7 @@ export async function publishData(pathToPublish: string, artifactName: string) {
     };
 
     tl.command("artifact.upload", data, pathToPublish);
-    logInformation('Completed Uploading Artifacts from : ' + pathToPublish + ' to location: ' + pathToPublish);
+    let event = 'Completed Uploading Artifacts from : ' + pathToPublish + ' to location: ' + pathToPublish
+    logInformation(event);  
+    LogEvent(event);
 }
-

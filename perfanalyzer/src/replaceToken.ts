@@ -1,5 +1,6 @@
 import {logInformation } from './utility'
 import {ERROR_DEFAULT_MSG, InputVariables, InputVariableType } from './constant'
+import { LogEvent } from './telemetry-client';
 const tl = require('azure-pipelines-task-lib/task'); 
 const fs = require('fs');
 const sh = require('shelljs'); 
@@ -8,7 +9,9 @@ export async function replaceTokens(fileName: string | null | undefined) {
     var errCount = 0;
     
     try {
-        logInformation("Starting Replace Tokens task for file: " + fileName);
+        let event2 = 'Starting Replace Tokens task for file: ' + fileName
+        logInformation(event2);  
+        LogEvent(event2); 
 
         // get the task vars
         let sourcePath: string | null | undefined= fileName;

@@ -22,7 +22,9 @@ export enum InputVariables {
     BLOB_PREFIX = 'BlobPrefix',
     OUTPUT_STORAGE_URI = 'outputStorageUri',
     ARTIFACT_NAME_REPORT = 'artifactNameReport',
-    ARTIFACT_NAME_LOG = 'artifactNameLog'
+    ARTIFACT_NAME_LOG = 'artifactNameLog',
+    FAIL_PIPELINE_IF_JMETER_FAILS = 'failPipelineIfJMeterFails',
+    MAX_FAILURE_COUNT_FOR_JMETER = 'maxFailureCountForJMeter'
 }
 export enum InputVariableType {
     SourceCode = 'sourceCode',

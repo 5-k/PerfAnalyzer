@@ -16,4 +16,6 @@ perfanalyzer/src/jmeter-utils.js
 perfanalyzer/src/model.js
 perfanalyzer/src/replaceToken.js
 perfanalyzer/src/utility.js
+perfanalyzer/*.js
 .taskkey
+perfanalyzer/appInsightsConnectionString

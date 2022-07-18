@@ -1,24 +1,33 @@
 import * as moment from 'moment'; 
 import { DATE_FORMAT } from './constant'
+import { v4 as uuidv4 } from 'uuid';
+import { LogEvent, trackTrace } from './telemetry-client';
+const globalAny:any = global;
+
 const tl = require('azure-pipelines-task-lib/task'); 
 const fs = require('fs');
 const https = require('https');
 const Path = require('path'); 
 let tar = require('tar');
+let UNIQUE_RUN_ID = uuidv4();
+globalAny.UNIQUE_RUN_ID = UNIQUE_RUN_ID;
 
 export function logInformation(data: any, printDate: boolean = true) {
+    let formattedData = data;
     if(printDate) {
-        let formattedDate = (moment(Date.now())).format(DATE_FORMAT)
-        console.log(formattedDate + ":  " + data);
-        tl.debug(formattedDate + ":  " + data)
-    } else {
-        console.log(data);
-        tl.debug(data)
-    }    
+        let formattedDate = (moment(Date.now())).format(DATE_FORMAT);
+        formattedData = formattedDate + ": " + UNIQUE_RUN_ID + " - " + data; 
+    }  
+    
+    console.log(formattedData);
+    tl.debug(formattedData) 
+    trackTrace(formattedData);
 }
 
 export async function downloadFile(fileSource: string, destinationFilePath: string) {
-    logInformation('Downloading File: ' + fileSource + ' to location: ' + destinationFilePath );
+    let event = 'Downloading File: ' + fileSource + ' to location: ' + destinationFilePath ;
+    LogEvent(event);
+    logInformation(event);
     return new Promise<void>((resolve, reject) => {
         https.get(fileSource, (response: { on: (arg0: string, arg1: (reason?: any) => void) => void; pipe: (arg0: any) => void; }) => {            
             let stream = fs.createWriteStream(destinationFilePath);
@@ -42,7 +51,9 @@ export async function unzipBinary(fileName: string) {
 
 
 export function copyFileToDirectory(sourcefilePath: string, destinationFilePath: string) {   
-    logInformation('Start Copying File to destination ' + destinationFilePath + ' from source ' + sourcefilePath)
+    let event = 'Start Copying File to destination ' + destinationFilePath + ' from source ' + sourcefilePath
+    LogEvent(event);
+    logInformation(event); 
     fs.copyFileSync(sourcefilePath, destinationFilePath, (err: any) => {
         if (err) throw err;
         logInformation('Completed '+ sourcefilePath + ' was copied to ' + destinationFilePath);

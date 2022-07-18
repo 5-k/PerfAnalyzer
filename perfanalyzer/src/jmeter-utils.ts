@@ -1,5 +1,5 @@
 import {logInformation, isEmpty, copyFileToDirectory, downloadFile, copyDirectoryRecursiveSync} from './utility'
-import {ERROR_DEFAULT_MSG, InputVariables, InputVariableType } from './constant'
+import {ERROR_DEFAULT_MSG, InputVariables, InputVariableType, LOG_JTL_FILE_NAME } from './constant'
 import { JMeterTestResults } from './model'
 let csv = require('csv-parser')
 const fs = require('fs');
@@ -119,19 +119,53 @@ export function promiseFromChildProcess(child) {
 }
 
 
-export async function analyzeJTL(fileNameAndPath: string, res:JMeterTestResults)  { 
-    await fs.createReadStream(fileNameAndPath)
-    .pipe(csv())
-        .on('data', function (row: any) { 
-        res.count++;
-        if(row?.success=='true') {
-            res.successCount++;
-        } else {
-            res.failureCount++
-        } 
+
+export function analyzeJTL(JMeterLogFolderPath: string) {
+
+    try {
+        let filePath = Path.join(JMeterLogFolderPath, LOG_JTL_FILE_NAME);
+        logInformation('Reading File: ' + filePath)
+        let readStream = fs.createReadStream(filePath);
+        let success: number = 0 ;
+        let errors: number = 0 ;
+        readStream
+            .pipe(csv())
+            .on('data', (data) => data.success=='true' ? success++ : errors++)
+            .on('end',function() {
+                logInformation('*** Summary JMeter Test Run **** ')
+                logInformation('SuccessCount: ' + success);
+                logInformation('ErrorCount: ' + errors);
+    
+                let failTaskIFJMeterFails = tl.getBoolInput(InputVariables.FAIL_PIPELINE_IF_JMETER_FAILS,true);
+                handleTestResults(errors, failTaskIFJMeterFails);  
+            })
+            .on('error', function(){
+                logInformation('Warning: Unable to analyze JTL File');
+            });  
+    } catch(e) {
+        tl.warning(' JMeter JTL Analysis failed: ' + e?.message , e)
     }
-    )
-    .on('end', function () {
-        return res;
-    }) 
+  
+}
+
+function handleTestResults(failureCount: number, failTaskIFJMeterFails: boolean) {
+    if(failTaskIFJMeterFails) {
+        let maxFailureCount = tl.getInput(InputVariables.MAX_FAILURE_COUNT_FOR_JMETER,true);
+        let maxFailureCountVal: number = 0;
+        try {
+            maxFailureCountVal = parseInt(maxFailureCount);
+        } catch(e) {
+            let msg = 'Value Provided for Max Failure Count is not Numeric. Hence unable to run validation. Skipping this step.';
+            logInformation(msg);
+            tl.warning(msg);
+            return;
+        }
+
+        if(failureCount > maxFailureCountVal) {
+            let msg = 'Max threshold set for failure surpassed. This task will be marked as failed.';
+            tl.warning(msg);
+            tl.setResult(tl.TaskResult.Failed, msg);
+            return;
+        }
+    }
 }
