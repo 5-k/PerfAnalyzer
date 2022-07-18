@@ -27,10 +27,9 @@ You need to enable static hosting in the storage container in order to be able t
 
 ![Screenshot](screenshots/Steps.gif)
 
+## Architecture
 
-## Demo
-
-![Screenshot](screenshots/Steps.gif)
+![Screenshot](screenshots/archi.png)
 
 
 ## Features
