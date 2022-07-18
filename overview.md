@@ -30,7 +30,7 @@ You need to enable static hosting in the storage container in order to be able t
 
 ## Architecture
 
-![Screenshot](screenshots/archi.gif)
+![Screenshot](screenshots/archi.png)
 
 
 
