@@ -194,7 +194,7 @@ The following variables are used in the pipeline. Some have default values which
 
 `Container Name`: This is the container name inside the storage account where your results and logs will be copied. This is defaulted to $web. Note that in case you want continious reporting available on html webpage, keep it to $web only. Files in $web will be available to view as html files.
 
-`Blob Prefix`: This is the prefix inside container name where each run's report will be copied. It is essential to note that for continious integration and testing it's best to prefix it will build number. This way all continious build's result will be made available at all times as a http exposed url. If used in Build pipeline, it can be Releases/Release_$(Build.BuildNumber), if in release then it can be Releases/Release_$(Release.ReleaseId).
+`Blob Prefix`: This is the prefix inside container name where each run's report will be copied. It is essential to note that for continious integration and testing it's best to prefix it will build number. This way all continious build's result will be made available at all times as a http exposed url. If used in Build pipeline, it can be `Releases/Release_$(Build.BuildNumber)`, if in release then it can be `Releases/Release_$(Release.ReleaseId)`.
 
 `Storage Container URI`: This is the Primary endpoint URI for your container. On Enabling static web hosting, this url is made available. If not specified, the task will not be able to create a direct html link to the test results.
 
