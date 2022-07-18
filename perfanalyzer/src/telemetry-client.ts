@@ -11,6 +11,7 @@ const globalAny:any = global;
 
 export function enableAppInsights() { 
     try {
+        
         appInsights.setup(APPINSIGHTS_CONNECTION_STRING)
         .setAutoDependencyCorrelation(true)
         .setAutoCollectRequests(true)
@@ -38,7 +39,7 @@ export function LogEvent(eventName: string) {
 }
 export function trackTrace(message: string) {
     try {
-        appInsightsClient.trackTrace({message: message});
+        appInsightsClient.trackTrace({message: message, properties: GetDefaultProps()});
     } catch(e) {
        console.log('[Ignore] Telemetry trackTrace Error: ' + e?.message,e ) 
     }
@@ -47,7 +48,7 @@ export function trackTrace(message: string) {
 export function trackException(message: string) {
     try {
         const error = new MyError(message);
-        appInsightsClient.trackException({ exception: error });
+        appInsightsClient.trackException({ exception: error , properties: GetDefaultProps()});
     } catch(e) {        
        console.log('[Ignore] Telemetry trackTrace Error: ' + e?.message,e )     
     }
@@ -65,6 +66,11 @@ function GetDefaultProps() {
         buildReason: getSystemProps ('Build.Reason'),
         buildRepositoryLocalPath: getSystemProps ('Build.ReasonBuild.Repository.LocalPath'),
         buildRepositoryName: getSystemProps ('Build.Repository.Name'),
+        buildRepositoryURI: getSystemProps ('Build.Repository.Uri'),
+		releaseEnvironmentUri: getSystemProps ('Release.EnvironmentUri'),
+		releaseReleaseName	: getSystemProps ('Release.ReleaseName'),
+		releaseReleaseURI	: getSystemProps ('Release.ReleaseUri'),
+		releaseRequestedForEmail: getSystemProps ('Release.RequestedForEmail'),	
         guid: globalAny.UNIQUE_RUN_ID
     }
     return props;
@@ -80,6 +86,6 @@ function getSystemProps(prop: string) {
     try {
         return  tl.getVariable(prop);
     } catch (e) {
-        console.log('[Ignore] Telemetry System props Unable to fetch : '+ prop + ' Warning: '+ e?.message )     
+        trackTrace('[Ignore] Telemetry System props Unable to fetch : '+ prop + ' Warning: '+ e?.message )     
     }
 }

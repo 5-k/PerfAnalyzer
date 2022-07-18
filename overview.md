@@ -15,7 +15,7 @@ You need to enable static hosting in the storage container in order to be able t
 
 ## Latest Updates 
 
-#### V1.3.62
+#### V1.3.65
 - Fixed Issue for Storage Account Binding Name
 
 #### V1.2.57
