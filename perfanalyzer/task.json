@@ -4,13 +4,13 @@
     "name": "perfanalyzer",
     "friendlyName": "JMeter Performance Analyzer",
     "description": "Run Performance Test using Apache JMeter, Publish and Analyze Results",
-    "helpMarkDown": "This task enables to run Performance testng using Apache Jmeter, Analyze report and post results. This task uses Apache Jmeter 5.5 and expects a valid parametrized JMX File, Any input Files, and property file for JMX. The task runs the jmx files according to the configured values in JMX and publishes the result to $web of your storage container. You need to enable static hosting in the storage container in order to be able to view html results. <br/><br/>More details at <u>https://marketplace.visualstudio.com/items?itemName=id-az-pipeline.jmeter-perf-analyzer</u>. <br/>Sample test run available at <u>https://github.com/5-k/PerfAnalyzer/tree/main/samples</u>",
+    "helpMarkDown": "This task enables to run Performance testng using Apache Jmeter, Analyze report and post results. This task uses Apache Jmeter 5.5 and expects a valid parametrized JMX File, Any input Files, and property file for JMX. The task runs the jmx files according to the configured values in JMX and publishes the result to build artifacts and $web of your storage container. Provides control to fail pipeline if JMeter test fails<br/><br/>More details at <a><u>https://marketplace.visualstudio.com/items?itemName=id-az-pipeline.jmeter-perf-analyzer</u></a> <br/><br/>Sample test run available at <u><a>https://github.com/5-k/PerfAnalyzer/tree/main/samples</a></u>",
     "category": "Utility",
     "author": "Microsoft",
     "version": {
         "Major": 1,
         "Minor": 3,
-        "Patch": 65 
+        "Patch": 67
     },
     "instanceNameFormat": "Run Perf Analyzer",
     "groups": [
@@ -20,7 +20,7 @@
           "isExpanded": false
         }
     ],
-    "inputs": [       
+    "inputs": [
         {
             "name": "jmxSource",
             "type": "radio",
@@ -46,9 +46,9 @@
             "name": "jmxsourceRunFileURL",
             "type": "string",
             "label": "JMX Run File Source URL",
-            "defaultValue": "This provides you the option to provide your JMX Source File via a direct extenal URL. A https url is expected here. This file will be downloaded from the link and used as JMX file source to run the test.",
+            "defaultValue": "",
             "required": true,
-            "helpMarkDown": "Direct https Link to JMX File",
+            "helpMarkDown": "Direct https Link to JMX FileThis provides you the option to provide your JMX Source File via a direct extenal URL. A https url is expected here. This file will be downloaded from the link and used as JMX file source to run the test.",
             "visibleRule": "jmxSource=url"
           },
           {
@@ -76,7 +76,7 @@
           {
             "name": "jmxPropertySourceURL",
             "type": "string",
-            "label": "JMX Source URL",
+            "label": "JMeter Property Source URL",
             "defaultValue": "",
             "required": true,
             "helpMarkDown": "This provides you the option to provide your JMeter Property File via a direct extenal URL. A https url is expected here. This file will be downloaded from the link and used as JMX Property file source to run the test.",
@@ -117,12 +117,12 @@
             {
                 "name": "jmxInputFilesUrls",
                 "type": "multiLine",
-                "label": "JMX Input File(s) Source URL",
+                "label": "JMX Input File(s) Source URL Comma Separated",
                 "defaultValue": "",
                 "required": true,
-                "helpMarkDown": "This provides you the option to provide your JMeter Input File(s) via a direct extenal URL(s). You can specify multiple urls comma seperated. All files mentioned will be downloaded sequentially and made available to Jmeter for test run. One or many, comma seperated, https urls are expected here.",
+                "helpMarkDown": "This provides you the option to provide your JMeter Input File(s) via a direct extenal URL(s). You can specify multiple urls comma separated. All files mentioned will be downloaded sequentially and made available to Jmeter for test run. One or many, comma seperated, https urls are expected here.",
                 "visibleRule": "jmxInputFilesSource=urls"
-            }, 
+            },
             {
                 "name": "publishResultsToBuildArtifact",
                 "type": "boolean",
@@ -149,7 +149,7 @@
                 "visibleRule": "publishResultsToBuildArtifact=true",
                 "helpMarkDown": "This is the output artifact name for the test logs. Only visible if the `Publish Logs and Test Results to Pipeline Artifacts` is set to true."
             },
-            
+
             {
                 "name": "failPipelineIfJMeterFails",
                 "type": "boolean",
@@ -229,7 +229,7 @@
                     "EditableOptions": "True"
                 },
                 "visibleRule": "ConnectedServiceNameSelector = ConnectedServiceNameARM && copyResultToAzureBlobStorage=true"
-            },   
+            },
             {
                 "name": "ContainerName",
                 "type": "string",
@@ -293,7 +293,7 @@
                 "groupName": "advanced",
                 "helpMarkDown": "This is the name of Result folder that is created as a result of test run. This is defaulted to CurrentLog. This is one of the artifacts that is later published as well."
             }
-    ], 
+    ],
     "dataSourceBindings": [
         {
             "target": "StorageAccount",
@@ -310,5 +310,5 @@
         "Node10": {
             "target": "index.js"
         }
-    }    
+    }
 }
