@@ -21,3 +21,4 @@ perfanalyzer/*.js
 .taskkey
 perfanalyzer/src/appInsightsConnectionString.ts
 perfanalyzer/test.ts
+perfanalyzer/test.js

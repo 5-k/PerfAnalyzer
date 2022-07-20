@@ -5,7 +5,7 @@ This explains the different variables you can use to add this task in your pipel
 
 ### Pipeline Inputs from Source Code
 
-`
+```
 steps:
 - task: id-az-pipeline.jmeter-perf-analyzer.custom-build-release-task.perfanalyzer@1
   displayName: 'Run Perf Analyzer'
@@ -25,11 +25,11 @@ steps:
     storage: <Your Storage Account Name>
     BlobPrefix: '<Your Release Prefix>/Release_$(Release.ReleaseId)' <-- (For Release Pipeline) OR  (For Build Pipeline) --> '<Your Release Prefix>/Release_$(Build.BuildNumber)'
     outputStorageUri: '<Your Storage Account's Primary Endpoint for Static Hosting>'
-`
+```
 
 ### Pipeline Inputs from External URLs
 
-`
+```
 steps:
 - task: id-az-pipeline.jmeter-perf-analyzer.custom-build-release-task.perfanalyzer@1
   displayName: 'Run Perf Analyzer'
@@ -52,11 +52,11 @@ steps:
     storage: <Your StorageAccount Name>
     BlobPrefix: '<Your Release Prefix>/Release_$(Release.ReleaseId)' <-- (For Release Pipeline) OR  (For Build Pipeline) --> '<Your Release Prefix>/Release_$(Build.BuildNumber)'
     outputStorageUri: '<Your Storage Account's Primary Endpoint for Static Hosting>'
-`
+```
 
 ### Pipeline Inputs from External URLs with no Property File and no input files.
 
-`
+```
 steps:
 - task: id-az-pipeline.jmeter-perf-analyzer.custom-build-release-task.perfanalyzer@1
   displayName: 'Run Perf Analyzer'
@@ -73,12 +73,12 @@ steps:
     storage: <Your StorageAccount Name>
     BlobPrefix: '<Your Release Prefix>/Release_$(Release.ReleaseId)' <-- (For Release Pipeline) OR  (For Build Pipeline) --> '<Your Release Prefix>/Release_$(Build.BuildNumber)'
     outputStorageUri: '<Your Storage Account's Primary Endpoint for Static Hosting>'
-`
+```
 
 ### Pipeline Inputs from External URLs with property file from Source but no input files.
 
 
-`
+```
 steps:
 - task: id-az-pipeline.jmeter-perf-analyzer.custom-build-release-task.perfanalyzer@1
   displayName: 'Run Perf Analyzer'
@@ -98,7 +98,7 @@ steps:
     storage: <Your StorageAccount Name>
     BlobPrefix: '<Your Release Prefix>/Release_$(Release.ReleaseId)' <-- (For Release Pipeline) OR  (For Build Pipeline) --> '<Your Release Prefix>/Release_$(Build.BuildNumber)'
     outputStorageUri: '<Your Storage Account's Primary Endpoint for Static Hosting>'
-`
+```
 
 
 ## Note
@@ -106,3 +106,5 @@ steps:
  - The Blob Prefix can be set to `Release_$(Release.ReleaseId)` in Release Pipeline and `Release_$(Build.BuildNumber)` in Build pipeline. The reason is that this will enable help create unique path per build/release. The system variable release id and build number will be populated as per the run.
  - JMX Source is compulsoty however property and input files are not. Hence can be set to `none`
  - In case you do not want to publish the html you can set 'copyResultToAzureBlobStorage' to false. In this case variables {azureSubscription, storage, BlobPrefix, outputStorageUri} will also not be required.
+ - You can try different combinations (Jmx from source, property from External url, inputs from source). All 3 inputs can be either sourceCode or url (urls in case of input file).
+ - In case you do not want the pipeline to fail even if the JMeter test has failed, you can set `failPipelineIfJMeterFails` to false. Also then variable `maxFailureCountForJMeter` won't be used.

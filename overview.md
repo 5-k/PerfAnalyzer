@@ -14,7 +14,7 @@ You need to enable static hosting in the storage container in order to be able t
 
 ## Latest Updates
 
-#### V1.3.67
+#### V1.3.68
 - Fixed Issue for Storage Account Binding Name
 
 #### V1.2.57
@@ -52,8 +52,10 @@ You need to enable static hosting in the storage container in order to be able t
 ## Sample Usage
 
 Follow this Link: [SAMPLE USAGE](https://github.com/5-k/PerfAnalyzer/blob/main/samples/README.md)
-Follow this Link: [YAML TASK BASED INPUT](https://github.com/5-k/PerfAnalyzer/blob/main/samples/InputTaskYAML.md)
-Follow this Link: [CLASSIC PIPELINE GUI BASED TASK BASED INPUT](https://github.com/5-k/PerfAnalyzer/blob/main/samples/InputTask.md)
+
+Follow this Link: [YAML TASK BASED INPUT](https://github.com/5-k/PerfAnalyzer/blob/main/InputTaskYAML.md)
+
+Follow this Link: [CLASSIC PIPELINE GUI BASED TASK BASED INPUT](https://github.com/5-k/PerfAnalyzer/blob/main/InputTask.md)
 
 ## Screenshots
 
@@ -62,7 +64,7 @@ Follow this Link: [CLASSIC PIPELINE GUI BASED TASK BASED INPUT](https://github.c
 
 ## Installation To your Pipeline
 
-1. Install the extension from Market Place: [HERE](https://marketplace.visualstudio.com/items?itemName=id-az-pipeline.jmeter-perf-analyzer)
+1. Install the extension from Market Place:
 
 ![Screenshot](screenshots/P1.png)
 

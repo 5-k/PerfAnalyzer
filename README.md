@@ -14,7 +14,7 @@ You need to enable static hosting in the storage container in order to be able t
 
 ## Latest Updates
 
-#### V1.3.67
+#### V1.3.68
 - Fixed Issue for Storage Account Binding Name
 
 #### V1.2.57
@@ -43,7 +43,6 @@ You need to enable static hosting in the storage container in order to be able t
 - Can Fail task if the JMeter results any failure. This would help in continuous integration test to identify any breaking change. Integrating this in build pipeline would help identify any breaking change before merge to main.
 
 
-
 ## Tech Stack
 
 **Client:** Typescript, JavaScript
@@ -51,73 +50,18 @@ You need to enable static hosting in the storage container in order to be able t
 **Server:** Node, Azure ARM Template, Azure Storage
 
 
-## Run Locally
-
-Clone the project
-
-```bash
-  git clone https://github.com/5-k/PerfAnalyzer
-```
-
-Go to the project directory task
-
-```bash
-  cd perfanalyzer
-```
-
-Install dependencies
-
-```bash
-  npm install
-```
-
-Compile the typescript file
-
-```bash
-  tsc index.ts
-```
-
-Run and debug locally using VS Code or Compiled Java-script file.
-
-
-## Packaging
-
-Once Compiled using tsc and the dependencies are downloaded using `npm i` you can package the project to create a `vsix`
-
-Update the publisher name in vss-extension.json
-```bash
-  touch vss-extension.json
-```
-
-Package the dependecies
-
-```bash
-  npx tfx extension create --manifest-globs vss-extension.json
-```
-
-You might get an error with the following text
-
-```bash
-   Error: Part Name 'perfanalyzer/node_modules/azure-pipelines-tasks-azure-arm-rest-v2/openssl/OpenSSL License.txt'
-```
-This is because of one of the dependencies  from azure-pipelines-tasks-azure-arm-rest-v2. There is a file named OpenSSL License.txt. You need to remove
-any blank space from this. Hence rename this file to OpenSSL_License.txt and rerun the command. You should get a successful output vsix file.
-
-```bash
-  === Completed operation: create extension ===
- - VSIX: C:\R\personal_projects\PerfAnalyzer\MishraPrateek.********-****-****-****-************-*.*.**.vsix
- - Extension ID: ********-****-****-****-************-*.*.**.vsix
- - Extension Version: 0.1.33
- - Publisher: MishraPrateek
-```
-You can now publish this extension to your own organization and share it with them.
-
-Follow the link for more Update: [AZURE WEB Extension](https://docs.microsoft.com/en-us/azure/devops/extend/get-started/node?view=azure-devops)
-
 ## Screenshots
 
 ![Screenshot](screenshots/P4.png)
 
+
+## Sample Usage
+
+Follow this Link: [SAMPLE USAGE](https://github.com/5-k/PerfAnalyzer/blob/main/samples/README.md)
+
+Follow this Link: [YAML TASK BASED INPUT](https://github.com/5-k/PerfAnalyzer/blob/main/InputTaskYAML.md)
+
+Follow this Link: [CLASSIC PIPELINE GUI BASED TASK BASED INPUT](https://github.com/5-k/PerfAnalyzer/blob/main/InputTask.md)
 
 ## Installation To your Pipeline
 
@@ -205,6 +149,71 @@ These variables are available under the `advanced` section of the pipeline. Thes
 `JMeter Log Folder Name`: This is the name of Log folder that is created as a result of test run. This is defaulted to `CurrentLog`. This is one of the artifacts that is later published as well.
 
 `JMeter Report Folder Name"`: This is the name of Result folder that is created as a result of test run. This is defaulted to `CurrentLog`. This is one of the artifacts that is later published as well.
+
+
+## Run Locally
+
+Clone the project
+
+```bash
+  git clone https://github.com/5-k/PerfAnalyzer
+```
+
+Go to the project directory task
+
+```bash
+  cd perfanalyzer
+```
+
+Install dependencies
+
+```bash
+  npm install
+```
+
+Compile the typescript file
+
+```bash
+  tsc index.ts
+```
+
+Run and debug locally using VS Code or Compiled Java-script file.
+
+
+## Packaging
+
+Once Compiled using tsc and the dependencies are downloaded using `npm i` you can package the project to create a `vsix`
+
+Update the publisher name in vss-extension.json
+```bash
+  touch vss-extension.json
+```
+
+Package the dependecies
+
+```bash
+  npx tfx extension create --manifest-globs vss-extension.json
+```
+
+You might get an error with the following text
+
+```bash
+   Error: Part Name 'perfanalyzer/node_modules/azure-pipelines-tasks-azure-arm-rest-v2/openssl/OpenSSL License.txt'
+```
+This is because of one of the dependencies  from azure-pipelines-tasks-azure-arm-rest-v2. There is a file named OpenSSL License.txt. You need to remove
+any blank space from this. Hence rename this file to OpenSSL_License.txt and rerun the command. You should get a successful output vsix file.
+
+```bash
+  === Completed operation: create extension ===
+ - VSIX: C:\R\personal_projects\PerfAnalyzer\MishraPrateek.********-****-****-****-************-*.*.**.vsix
+ - Extension ID: ********-****-****-****-************-*.*.**.vsix
+ - Extension Version: 0.1.33
+ - Publisher: MishraPrateek
+```
+You can now publish this extension to your own organization and share it with them.
+
+Follow the link for more Update: [AZURE WEB Extension](https://docs.microsoft.com/en-us/azure/devops/extend/get-started/node?view=azure-devops)
+
 
 ## 🚀 About Me
 I am a Full stack Developer working at Microsoft IDC Research and Development. Connect with me over LinkedIn
